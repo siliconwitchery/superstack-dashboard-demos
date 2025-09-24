@@ -233,7 +233,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <h3>VOC</h3><canvas id="vocGauge" width="200" height="150"></canvas>
             </div>
           </div>
-          <p>
+          <p>Fan is: ${entry.data.fan ? "On" : "Off"}</p>
           <p>Fetched at: <span id="fetchTime">${fetchTime}</span></p>`;
         // <p>Latest Timestamp: ${entry.timestamp || ""}</p>
         renderAir({
