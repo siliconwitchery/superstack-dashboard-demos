@@ -168,6 +168,20 @@ document.addEventListener("DOMContentLoaded", () => {
     return await res.json();
   }
 
+  function setConnectionStatus(connected) {
+    const statusEl = document.getElementById("connectionStatus");
+    if (!statusEl) return;
+    if (connected) {
+      statusEl.textContent = "Connected";
+      statusEl.classList.remove("not-connected");
+      statusEl.classList.add("connected");
+    } else {
+      statusEl.textContent = "Not Connected";
+      statusEl.classList.remove("connected");
+      statusEl.classList.add("not-connected");
+    }
+  }
+
   async function loadLatest(type, silent) {
     try {
       let data;
@@ -186,8 +200,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!data) throw new Error("No API data");
       const entry = data[data.length - 1];
       show(type, entry, silent);
+      setConnectionStatus(true);
     } catch (err) {
       console.warn("API failed, fallback to local", err);
+      setConnectionStatus(false);
       try {
         const res = await fetch(`data/${type}.json`);
         const data = await res.json();

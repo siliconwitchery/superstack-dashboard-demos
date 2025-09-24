@@ -50,3 +50,27 @@
   background: green;
   height: 0%;
 }
+
+.status-indicator {
+  position: fixed;
+  top: 10px;
+  right: 15px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 4px;
+  background: #ccc;
+  color: black;
+  z-index: 1000;
+  transition: all 0.3s ease;
+}
+
+.status-indicator.connected {
+  background: #4caf50;
+  color: white;
+}
+
+.status-indicator.not-connected {
+  background: #f44336;
+  color: white;
+}
