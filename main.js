@@ -95,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
           const res = await fetch("https://super.siliconwitchery.com/api/data", {
             method: "POST",
-            mode: "same-origin",
             headers: {
               "Content-Type": "application/json",
               "X-Api-Key": key,
@@ -153,7 +152,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const res = await fetch("https://super.siliconwitchery.com/api/data", {
       method: "POST",
-      mode: "same-origin",
       headers: {
         "Content-Type": "application/json",
         "X-Api-Key": key,
