@@ -89,6 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
             headers: {
               "Content-Type": "application/json",
               "X-Api-Key": key,
+              "Access-Control-Allow-Origin": "*"
             },
             body: JSON.stringify(payload),
           });
