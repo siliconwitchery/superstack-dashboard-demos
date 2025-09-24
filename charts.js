@@ -64,9 +64,9 @@ function makeGauge(canvasId, maxValue, unit) {
 }
 
 export function renderAir(d) {
-  charts.aqi = makeGauge("aqiGauge", 100, d.air_quality_unit || "%");
+  charts.aqi = makeGauge("aqiGauge", 10, d.air_quality_unit || "");
   charts.co2 = makeGauge("co2Gauge", 1000, d.co2_unit || "ppm");
-  charts.voc = makeGauge("vocGauge", 100, d.voc_unit || "ppb");
+  charts.voc = makeGauge("vocGauge", 1000, d.voc_unit || "ppb");
 
   updateAir({
     air_quality: d.air_quality,
@@ -95,9 +95,9 @@ export function updateAir(d, fetchTime) {
 }
 
 export function renderPower(d) {
-  charts.voltage = makeGauge("voltageGauge", 500, d.voltage?.unit || "V");
-  charts.current = makeGauge("currentGauge", 50, d.current?.unit || "A");
-  charts.power = makeGauge("powerGauge", 5000, d.power?.unit || "W");
+  charts.voltage = makeGauge("voltageGauge", 24, d.voltage?.unit || "V");
+  charts.current = makeGauge("currentGauge", 4, d.current?.unit || "A");
+  charts.power = makeGauge("powerGauge", 50, d.power?.unit || "W");
   updatePower(d);
 }
 export function updatePower(d, fetchTime) {

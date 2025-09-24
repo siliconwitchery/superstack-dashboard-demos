@@ -233,11 +233,12 @@ document.addEventListener("DOMContentLoaded", () => {
               <h3>VOC</h3><canvas id="vocGauge" width="200" height="150"></canvas>
             </div>
           </div>
+          <p>
           <p>Fetched at: <span id="fetchTime">${fetchTime}</span></p>`;
           // <p>Latest Timestamp: ${entry.timestamp || ""}</p>
         renderAir({
           air_quality: entry.data.airquality,
-          air_quality_unit: "%",
+          air_quality_unit: "",
           equivalent_CO2: entry.data.equivalent_CO2,
           co2_unit: "ppm",
           total_volatile_compounds: entry.data.total_volatile_compounds,

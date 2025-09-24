@@ -7,7 +7,8 @@
     "data": {
       "airquality": 100,
       "equivalent_CO2": 424,
-      "total_volatile_compounds": 34
+      "total_volatile_compounds": 34,
+      "fan": false
     }
   }
 ]
