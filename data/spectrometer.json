@@ -1,0 +1,11 @@
+[
+  {
+    "device_name": "Spectrometer",
+    "device_group": "development",
+    "timestamp": "2025-09-23T14:40:00.111111Z",
+    "data_uuid": "uuid-3",
+    "data": {
+      "wavelength": 405
+    }
+  }
+]
