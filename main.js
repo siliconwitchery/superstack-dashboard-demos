@@ -21,7 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll(".menu-section").forEach((s) =>
         s !== btn.parentElement ? s.classList.remove("active") : null
       );
-      btn.parentElement.classList.toggle("active");
+      document.querySelectorAll(".menu-section").forEach((s) =>
+        s.classList.remove("active")
+      );
+      btn.parentElement.classList.add("active");
       if (btn.parentElement.classList.contains("active")) {
         currentType = type;
         if (type === "settings") {
@@ -41,16 +44,22 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+  const settingsBtn = document.querySelector(
+    '.menu-section[data-type="settings"] .menu-btn'
+  );
+  if (settingsBtn) {
+    settingsBtn.click();
+  }
 
   function renderSettings() {
     contentArea.innerHTML = `
       <h2>Settings</h2>
       <form id="apiForm" style="display:flex;flex-direction:column;max-width:400px;gap:10px;">
         <label>API Key:
-          <input type="text" value="Jc9kdtAMoNiQcao-SDQvg8dtZ33HoWkHFJmjhnY5Mu4" id="apiKey" style="width:100%;padding:5px;"/>
+          <input type="text" id="apiKey" style="width:100%;padding:5px;"/>
         </label>
         <label>Deployment ID:
-          <input type="text" value="2b549e58-b05b-4a24-8266-2843b6538de6" id="deploymentId" style="width:100%;padding:5px;"/>
+          <input type="text" id="deploymentId" style="width:100%;padding:5px;"/>
         </label>
         <button type="submit" style="padding:6px 12px;">Connect & Fetch</button>
       </form>
