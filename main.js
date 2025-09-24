@@ -95,10 +95,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
           const res = await fetch("https://super.siliconwitchery.com/api/data", {
             method: "POST",
+            mode: "no-cors",
             headers: {
               "Content-Type": "application/json",
               "X-Api-Key": key,
-              "Access-Control-Allow-Origin": "*"
             },
             body: JSON.stringify(payload),
           });
@@ -153,6 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const res = await fetch("https://super.siliconwitchery.com/api/data", {
       method: "POST",
+      mode: "no-cors",
       headers: {
         "Content-Type": "application/json",
         "X-Api-Key": key,
@@ -164,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const txt = await res.text();
       console.log("API fetch failed", res.status, txt);
       throw new Error("API fetch failed " + res.status + ": " + txt);
-    } 
+    }
     return await res.json();
   }
 
@@ -235,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
           <p>
           <p>Fetched at: <span id="fetchTime">${fetchTime}</span></p>`;
-          // <p>Latest Timestamp: ${entry.timestamp || ""}</p>
+        // <p>Latest Timestamp: ${entry.timestamp || ""}</p>
         renderAir({
           air_quality: entry.data.airquality,
           air_quality_unit: "",
@@ -265,7 +266,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <div style="text-align:center;"><h3>Power</h3><canvas id="powerGauge" width="200" height="150"></canvas></div>
           </div>
           <p>Fetched at: <span id="fetchTime">${fetchTime}</span></p>`;
-          // <p>Latest Timestamp: ${entry.timestamp || ""}</p>
+        // <p>Latest Timestamp: ${entry.timestamp || ""}</p>
         renderPower({
           voltage: { value: entry.data.voltage, unit: "V" },
           current: { value: entry.data.current, unit: "A" },
@@ -293,7 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <h2 id="resultText"></h2>
           </div>
           <p>Fetched at: <span id="fetchTime">${fetchTime}</span></p>`;
-          // <p>Latest Timestamp: ${entry.timestamp || ""}</p>
+        // <p>Latest Timestamp: ${entry.timestamp || ""}</p>
       }
       renderSpect(entry.data, fetchTime);
     }
@@ -311,7 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <iframe id="mapFrame" width="600" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
           </div>
           <p>Fetched at: <span id="fetchTime">${fetchTime}</span></p>`;
-          // <p>Latest Timestamp: ${entry.timestamp || ""}</p>
+        // <p>Latest Timestamp: ${entry.timestamp || ""}</p>
         renderBin(entry.data);
       } else {
         document.getElementById("binFill").style.height =
