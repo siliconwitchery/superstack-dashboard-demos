@@ -168,20 +168,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return await res.json();
   }
 
-  function setConnectionStatus(connected) {
-    const statusEl = document.getElementById("connectionStatus");
-    if (!statusEl) return;
-    if (connected) {
-      statusEl.textContent = "Connected";
-      statusEl.classList.remove("not-connected");
-      statusEl.classList.add("connected");
-    } else {
-      statusEl.textContent = "Not Connected";
-      statusEl.classList.remove("connected");
-      statusEl.classList.add("not-connected");
-    }
-  }
-
   async function loadLatest(type, silent) {
     try {
       let data;
@@ -330,39 +316,6 @@ document.addEventListener("DOMContentLoaded", () => {
 let apiKeyGlobal = null;
 let deploymentIdGlobal = null;
 
-// TODO Event handler to switch between tabs
-// Just unhides the one clicked, and hides the others
-
-// TODO Event handler to apply the API key and deployment ID global values when submit is clicked
-// Requires the HTML to be moved into the index.html first
-// document
-//   .getElementById("apiForm")
-//   .addEventListener("submit", async (e) => {
-//     e.preventDefault();
-//     console.log("Connect & Fetch button pressed!");
-
-//     // Get the values from the form
-//     apiKeyGlobal = document.getElementById("apiKey").value.trim();
-//     deploymentIdGlobal = document.getElementById("deploymentId").value.trim();
-
-//     // Validate input
-//     if (!apiKeyGlobal || !deploymentIdGlobal) {
-//       console.log("Please enter both API Key and Deployment ID");
-//       return;
-//     }
-
-//     console.log("API Key set:", apiKeyGlobal);
-//     console.log("Deployment ID set:", deploymentIdGlobal);
-
-//     // Update status message
-//     const statusEl = document.getElementById("apiStatus");
-//     if (statusEl) {
-//       statusEl.textContent = "✅ Connected - Timer will start fetching data";
-//       statusEl.style.color = "green";
-//     }
-//   });
-
-// Fetching function
 async function fetchFromApi2(apiKey, deploymentId) {
 
   if (apiKey == null || deploymentId == null) {
@@ -410,7 +363,11 @@ function startTimerLoop() {
     let result = await fetchFromApi2(apiKey, deploymentId)
 
     if (result != null) {
-      console.log(result)
+      setConnectionStatus(true);
+      console.log(result);
+      // TODO: update charts
+    } else {
+      setConnectionStatus(false);
       // If result contains air quality device name
       // Update air quality graphs
 
@@ -421,6 +378,19 @@ function startTimerLoop() {
     }
 
   }, 1000);
+}
+function setConnectionStatus(connected) {
+  const statusEl = document.getElementById("connectionStatus");
+  if (!statusEl) return;
+  if (connected) {
+    statusEl.textContent = "Connected";
+    statusEl.classList.remove("not-connected");
+    statusEl.classList.add("connected");
+  } else {
+    statusEl.textContent = "Not Connected";
+    statusEl.classList.remove("connected");
+    statusEl.classList.add("not-connected");
+  }
 }
 
 // Start the timer loop
