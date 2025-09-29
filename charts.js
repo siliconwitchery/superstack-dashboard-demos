@@ -1,23 +1,21 @@
 let charts = {};
 
-// ---- Gauge Needle Plugin ----
 const gaugeNeedle = {
   id: "gaugeNeedle",
   afterDatasetDraw(chart) {
     const dataset = chart.config.data.datasets[0];
     const { ctx } = chart;
-    const value = dataset.currentValue || 0;
-    const maxValue = dataset.maxValue || 1;
+    const value = (dataset.currentValue || 0).toFixed(2);
+    const maxValue = (dataset.maxValue || 1).toFixed(2);
 
-    const angle = (Math.PI * value) / maxValue;
+    const angle = (Math.PI * dataset.currentValue) / dataset.maxValue;
     const cx = chart.width / 2;
-    const cy = chart.height - 25;
+    const cy = chart.height - 75;
     const r = chart.width / 2.3;
 
     ctx.save();
     ctx.translate(cx, cy);
     ctx.rotate(Math.PI + angle);
-
     ctx.beginPath();
     ctx.moveTo(0, -5);
     ctx.lineTo(r, 0);
@@ -27,16 +25,22 @@ const gaugeNeedle = {
     ctx.fill();
     ctx.restore();
 
-    const lx = 100;
-    const ly = 145;
     ctx.font = "16px Arial";
     ctx.fillStyle = "black";
     ctx.textAlign = "center";
-    ctx.fillText(value + " " + (dataset.unit || ""), lx, ly);
+    ctx.fillText(`${value} ${dataset.unit || ""}`, cx, chart.height - 20);
+
+    const endAngle = Math.PI;
+    const endX = cx + Math.cos(endAngle) * r + 230;
+    const endY = cy + Math.sin(endAngle) * r + 20;
+
+    ctx.font = "14px Arial";
+    ctx.fillStyle = "gray";
+    ctx.textAlign = "center";
+    ctx.fillText(`${maxValue} ${dataset.unit || ""}`, endX, endY - 5);
   },
 };
 
-// ---- Gauge Maker ----
 function makeGauge(canvasId, maxValue, unit) {
   return new Chart(document.getElementById(canvasId), {
     type: "doughnut",
@@ -44,7 +48,7 @@ function makeGauge(canvasId, maxValue, unit) {
       datasets: [
         {
           data: [maxValue],
-          backgroundColor: ["blue"],
+          backgroundColor: ["lightblue"],
           borderWidth: 0,
           circumference: 180,
           rotation: 270,
@@ -64,7 +68,6 @@ function makeGauge(canvasId, maxValue, unit) {
   });
 }
 
-// ---- Air Quality ----
 export function renderAir(d, fetchTime) {
   if (!charts.aqi) charts.aqi = makeGauge("aqiGauge", 10, d.air_quality_unit || "");
   if (!charts.co2) charts.co2 = makeGauge("co2Gauge", 1000, d.co2_unit || "ppm");
@@ -81,7 +84,6 @@ export function renderAir(d, fetchTime) {
   if (fetchTime) document.getElementById("fetchTimeAir").textContent = fetchTime;
 }
 
-// ---- Power ----
 export function renderPower(d, fetchTime) {
   if (!charts.voltage) charts.voltage = makeGauge("voltageGauge", 24, d.voltage?.unit || "V");
   if (!charts.current) charts.current = makeGauge("currentGauge", 4, d.current?.unit || "A");
@@ -98,7 +100,6 @@ export function renderPower(d, fetchTime) {
   if (fetchTime) document.getElementById("fetchTimePower").textContent = fetchTime;
 }
 
-// ---- Spectrometer ----
 function wavelengthToColor(wl) {
   let r = 0, g = 0, b = 0;
   if (wl >= 380 && wl < 440) { r = -(wl - 440) / (440 - 380); b = 1; }
@@ -121,7 +122,6 @@ export function renderSpect(d, fetchTime) {
   if (fetchTime) document.getElementById("fetchTimeSpect").textContent = fetchTime;
 }
 
-// ---- Bin ----
 export function renderBin(d, fetchTime) {
   const level = d.bin || 0;
   const binFill = document.getElementById("binFill");
