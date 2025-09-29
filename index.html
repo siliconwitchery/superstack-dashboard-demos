@@ -30,7 +30,62 @@
     </div>
     <div class="main">
       <h1>Silicon Witchery Panel</h1>
-      <div id="contentArea"></div>
+      <div id="contentArea">
+      <section id="settingsPage">
+        <h2>Settings</h2>
+        <form id="apiForm">
+          <label>API Key:
+            <input type="text" id="apiKey" />
+          </label>
+          <label>Deployment ID:
+            <input type="text" id="deploymentId" />
+          </label>
+          <button type="submit">Connect & Fetch</button>
+        </form>
+        <p id="apiStatus"></p>
+      </section>
+
+      <section id="airqualityPage" style="display:none;">
+        <div style="display:flex;justify-content:space-around;">
+          <div><h3>AQI</h3><canvas id="aqiGauge"></canvas></div>
+          <div><h3>CO₂</h3><canvas id="co2Gauge"></canvas></div>
+          <div><h3>VOC</h3><canvas id="vocGauge"></canvas></div>
+        </div>
+        <p>Fan is: <span id="fanStatus"></span></p>
+        <p>Fetched at: <span id="fetchTimeAir"></span></p>
+      </section>
+
+      <section id="powerPage" style="display:none;">
+        <div style="display:flex;justify-content:space-around;">
+          <div><h3>Voltage</h3><canvas id="voltageGauge"></canvas></div>
+          <div><h3>Current</h3><canvas id="currentGauge"></canvas></div>
+          <div><h3>Power</h3><canvas id="powerGauge"></canvas></div>
+        </div>
+        <p>Fetched at: <span id="fetchTimePower"></span></p>
+      </section>
+
+      <section id="spectrometerPage" style="display:none;">
+        <div style="text-align:center;">
+          <h3>Spectrum Color</h3>
+          <div id="colorBox"></div>
+          <h3 id="wavelengthText"></h3>
+          <h2 id="resultText"></h2>
+        </div>
+        <p>Fetched at: <span id="fetchTimeSpect"></span></p>
+      </section>
+
+      <section id="binsensorPage" style="display:none;">
+        <div style="text-align:center;position:relative;">
+          <h3>Trash Level</h3>
+          <div id="binLevelGraphic">
+            <div id="binFill"></div>
+          </div>
+          <h3>Location</h3>
+          <iframe id="mapFrame"></iframe>
+        </div>
+        <p>Fetched at: <span id="fetchTimeBin"></span></p>
+      </section>
+      </div>
     </div>
   </div>
 </body>

@@ -167,145 +167,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
     return await res.json();
   }
-
-  async function loadLatest(type, silent) {
-    try {
-      let data;
-      if (apiKey && deploymentId) {
-        if (type === "power") {
-          data = await fetchFromApi("Power Meter", apiKey, deploymentId);
-        } else if (type === "airquality") {
-          data = await fetchFromApi("Air Quality Sensor", apiKey, deploymentId);
-        } else if (type === "spectrometer") {
-          data = await fetchFromApi("Spectrometer", apiKey, deploymentId);
-        } else if (type === "binsensor") {
-          data = await fetchFromApi("Bin Sensor", apiKey, deploymentId);
-        }
-      }
-
-      if (!data) throw new Error("No API data");
-      const entry = data[data.length - 1];
-      show(type, entry, silent);
-      setConnectionStatus(true);
-    } catch (err) {
-      console.warn("API failed, fallback to local", err);
-      setConnectionStatus(false);
-      try {
-        const res = await fetch(`data/${type}.json`);
-        const data = await res.json();
-        if (!data.length) return;
-        const entry = data[data.length - 1];
-        show(type, entry, silent);
-      } catch (e) {
-        console.error("Local fallback failed", e);
-      }
-    }
-  }
-
-  function show(type, entry, silent) {
-    const fetchTime = new Date().toLocaleString();
-
-    if (type === "airquality") {
-      if (!silent) {
-        contentArea.innerHTML = `
-          <div style="display:flex;justify-content:space-around;">
-            <div style="text-align:center;">
-              <h3>AQI</h3><canvas id="aqiGauge" width="200" height="150"></canvas>
-            </div>
-            <div style="text-align:center;">
-              <h3>CO₂</h3><canvas id="co2Gauge" width="200" height="150"></canvas>
-            </div>
-            <div style="text-align:center;">
-              <h3>VOC</h3><canvas id="vocGauge" width="200" height="150"></canvas>
-            </div>
-          </div>
-          <p>Fan is: ${entry.data.fan ? "On" : "Off"}</p>
-          <p>Fetched at: <span id="fetchTime">${fetchTime}</span></p>`;
-        // <p>Latest Timestamp: ${entry.timestamp || ""}</p>
-        renderAir({
-          air_quality: entry.data.airquality,
-          air_quality_unit: "",
-          equivalent_CO2: entry.data.equivalent_CO2,
-          co2_unit: "ppm",
-          total_volatile_compounds: entry.data.total_volatile_compounds,
-          voc_unit: "ppb",
-        });
-      } else {
-        updateAir(
-          {
-            air_quality: entry.data.airquality,
-            equivalent_CO2: entry.data.equivalent_CO2,
-            total_volatile_compounds: entry.data.total_volatile_compounds,
-          },
-          fetchTime
-        );
-      }
-    }
-
-    else if (type === "power") {
-      if (!silent) {
-        contentArea.innerHTML = `
-          <div style="display:flex;justify-content:space-around;">
-            <div style="text-align:center;"><h3>Voltage</h3><canvas id="voltageGauge" width="200" height="150"></canvas></div>
-            <div style="text-align:center;"><h3>Current</h3><canvas id="currentGauge" width="200" height="150"></canvas></div>
-            <div style="text-align:center;"><h3>Power</h3><canvas id="powerGauge" width="200" height="150"></canvas></div>
-          </div>
-          <p>Fetched at: <span id="fetchTime">${fetchTime}</span></p>`;
-        // <p>Latest Timestamp: ${entry.timestamp || ""}</p>
-        renderPower({
-          voltage: { value: entry.data.voltage, unit: "V" },
-          current: { value: entry.data.current, unit: "A" },
-          power: { value: entry.data.power, unit: "W" },
-        });
-      } else {
-        updatePower(
-          {
-            voltage: { value: entry.data.voltage, unit: "V" },
-            current: { value: entry.data.current, unit: "A" },
-            power: { value: entry.data.power, unit: "W" },
-          },
-          fetchTime
-        );
-      }
-    }
-
-    else if (type === "spectrometer") {
-      if (!silent) {
-        contentArea.innerHTML = `
-          <div style="text-align:center;">
-            <h3>Spectrum Color</h3>
-            <div id="colorBox" style="width:200px;height:200px;margin:auto;border:1px solid #000;"></div>
-            <h3 id="wavelengthText"></h3>
-            <h2 id="resultText"></h2>
-          </div>
-          <p>Fetched at: <span id="fetchTime">${fetchTime}</span></p>`;
-        // <p>Latest Timestamp: ${entry.timestamp || ""}</p>
-      }
-      renderSpect(entry.data, fetchTime);
-    }
-
-    else if (type === "binsensor") {
-      if (!silent) {
-        const { latitude, longitude } = entry.data.location;
-        contentArea.innerHTML = `
-          <div style="text-align:center;position:relative;">
-            <h3>Trash Level</h3>
-            <div id="binLevelGraphic" style="position:relative;width:100px;height:150px;border:2px solid black;margin:auto;">
-              <div id="binFill" style="position:absolute;bottom:0;left:0;width:100%;background:green;height:0%;"></div>
-            </div>
-            <h3>Location</h3>
-            <iframe id="mapFrame" width="600" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-          </div>
-          <p>Fetched at: <span id="fetchTime">${fetchTime}</span></p>`;
-        // <p>Latest Timestamp: ${entry.timestamp || ""}</p>
-        renderBin(entry.data);
-      } else {
-        document.getElementById("binFill").style.height =
-          (entry.data.bin || 0) + "%";
-        document.getElementById("fetchTime").textContent = fetchTime;
-      }
-    }
-  }
 });
 
 ///////////////////
@@ -392,6 +253,86 @@ function setConnectionStatus(connected) {
     statusEl.classList.add("not-connected");
   }
 }
+
+function show(type, entry, silent) {
+  const fetchTime = new Date().toLocaleString();
+
+  if (type === "airquality") {
+    document.getElementById("settingsPage").style.display = "none";
+    document.getElementById("airqualityPage").style.display = "block";
+
+    document.getElementById("fanStatus").textContent = entry.data.fan
+      ? "On"
+      : "Off";
+    document.getElementById("fetchTimeAir").textContent = fetchTime;
+
+    if (!silent) {
+      renderAir({
+        air_quality: entry.data.airquality,
+        air_quality_unit: "",
+        equivalent_CO2: entry.data.equivalent_CO2,
+        co2_unit: "ppm",
+        total_volatile_compounds: entry.data.total_volatile_compounds,
+        voc_unit: "ppb",
+      });
+    } else {
+      updateAir(
+        {
+          air_quality: entry.data.airquality,
+          equivalent_CO2: entry.data.equivalent_CO2,
+          total_volatile_compounds: entry.data.total_volatile_compounds,
+        },
+        fetchTime
+      );
+    }
+  }
+
+  else if (type === "power") {
+    document.getElementById("settingsPage").style.display = "none";
+    document.getElementById("powerPage").style.display = "block";
+    document.getElementById("fetchTimePower").textContent = fetchTime;
+
+    if (!silent) {
+      renderPower({
+        voltage: { value: entry.data.voltage, unit: "V" },
+        current: { value: entry.data.current, unit: "A" },
+        power: { value: entry.data.power, unit: "W" },
+      });
+    } else {
+      updatePower(
+        {
+          voltage: { value: entry.data.voltage, unit: "V" },
+          current: { value: entry.data.current, unit: "A" },
+          power: { value: entry.data.power, unit: "W" },
+        },
+        fetchTime
+      );
+    }
+  }
+
+  else if (type === "spectrometer") {
+    document.getElementById("settingsPage").style.display = "none";
+    document.getElementById("spectrometerPage").style.display = "block";
+    document.getElementById("fetchTimeSpect").textContent = fetchTime;
+
+    renderSpect(entry.data, fetchTime);
+  }
+
+  else if (type === "binsensor") {
+    document.getElementById("settingsPage").style.display = "none";
+    document.getElementById("binsensorPage").style.display = "block";
+    document.getElementById("fetchTimeBin").textContent = fetchTime;
+
+    if (!silent) {
+      renderBin(entry.data);
+    } else {
+      document.getElementById("binFill").style.height =
+        (entry.data.bin || 0) + "%";
+    }
+  }
+}
+
+
 
 // Start the timer loop
 startTimerLoop();
