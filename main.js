@@ -50,7 +50,7 @@ function startTimerLoop() {
     apiKey = document.getElementById("apiKey").value.trim();
     deploymentId = document.getElementById("deploymentId").value.trim();
 
-    loadLatest(currentType, true);
+    loadLatest(currentType);
 
   }, 1000);
 }
@@ -61,14 +61,14 @@ function Closealltabs() {
     .forEach((sec) => (sec.style.display = "none"));
 }
 
-async function loadLatest(type, silent) {
+async function loadLatest(type) {
   // console.log(`Loading latest data for ${type} with apikey=${apiKey} depid=${deploymentId}`);
 
   let deviceName;
   if (type === "power") {
     deviceName = "Power Meter";
   } else if (type === "airquality") {
-    deviceName = "Air Quality Sensor";
+    deviceName = "air_quality";
   } else if (type === "spectrometer") {
     deviceName = "Spectrometer";
   } else if (type === "binsensor") {
@@ -83,7 +83,7 @@ const allData = await fetchFromApi2(deviceName, apiKey, deploymentId);
   }
 
   const entry = allData[allData.length - 1];
-  show(type, entry, silent);
+  show(type, entry);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -130,80 +130,51 @@ function setConnectionStatus(connected) {
   }
 }
 
-function show(type, entry, silent) {
+function show(type, entry) {
   const fetchTime = new Date().toLocaleString();
 
   if (type === "airquality") {
-    document.getElementById("settingsPage").style.display = "none";
     document.getElementById("airqualityPage").style.display = "block";
-
-    document.getElementById("fanStatus").textContent = entry.data.fan
-      ? "On"
-      : "Off";
+    document.getElementById("fanStatus").textContent =
+      entry.data?.fan ? "On" : "Off";
     document.getElementById("fetchTimeAir").textContent = fetchTime;
 
-    if (!silent) {
-      renderAir({
-        air_quality: entry.data.airquality,
-        air_quality_unit: "",
-        equivalent_CO2: entry.data.equivalent_CO2,
-        co2_unit: "ppm",
-        total_volatile_compounds: entry.data.total_volatile_compounds,
-        voc_unit: "ppb",
-      });
-    } else {
-      updateAir(
-        {
-          air_quality: entry.data.airquality,
-          equivalent_CO2: entry.data.equivalent_CO2,
-          total_volatile_compounds: entry.data.total_volatile_compounds,
-        },
-        fetchTime
-      );
-    }
+    renderAir({
+      air_quality: entry.data?.airquality || 0,
+      air_quality_unit: "",
+      equivalent_CO2: entry.data?.equivalent_CO2 || 0,
+      co2_unit: "ppm",
+      total_volatile_compounds: entry.data?.total_volatile_compounds || 0,
+      voc_unit: "ppb",
+    });
   }
 
   else if (type === "power") {
-    document.getElementById("settingsPage").style.display = "none";
     document.getElementById("powerPage").style.display = "block";
     document.getElementById("fetchTimePower").textContent = fetchTime;
 
-    if (!silent) {
-      renderPower({
-        voltage: { value: entry.data.voltage, unit: "V" },
-        current: { value: entry.data.current, unit: "A" },
-        power: { value: entry.data.power, unit: "W" },
-      });
-    } else {
-      updatePower(
-        {
-          voltage: { value: entry.data.voltage, unit: "V" },
-          current: { value: entry.data.current, unit: "A" },
-          power: { value: entry.data.power, unit: "W" },
-        },
-        fetchTime
-      );
-    }
+    renderPower({
+      voltage: { value: entry.data?.voltage || 0, unit: "V" },
+      current: { value: entry.data?.current || 0, unit: "A" },
+      power: { value: entry.data?.power || 0, unit: "W" },
+    });
   }
 
   else if (type === "spectrometer") {
-    document.getElementById("settingsPage").style.display = "none";
     document.getElementById("spectrometerPage").style.display = "block";
     document.getElementById("fetchTimeSpect").textContent = fetchTime;
 
-    renderSpect(entry.data, fetchTime);
+    renderSpect(entry.data || {}, fetchTime);
   }
 
   else if (type === "binsensor") {
-    document.getElementById("settingsPage").style.display = "none";
     document.getElementById("binsensorPage").style.display = "block";
     document.getElementById("fetchTimeBin").textContent = fetchTime;
 
-    if (!silent) {
+    if (entry.data) {
       renderBin(entry.data);
     } else {
-      document.getElementById("binFill").style.height =
-        (entry.data.bin || 0) + "%";
+      document.getElementById("binFill").style.height = "0%";
     }
   }
 }
