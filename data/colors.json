@@ -1,0 +1,18 @@
+{
+  "unit": "counts16",
+  "maxCount": 65535,
+  "channels": [
+    { "name": "F1", "wavelength": 405, "value": 5632 },
+    { "name": "F2", "wavelength": 425, "value": 6912 },
+    { "name": "FZ", "wavelength": 450, "value": 22016 },
+    { "name": "F3", "wavelength": 475, "value": 29440 },
+    { "name": "F4", "wavelength": 515, "value": 53248 },
+    { "name": "F5", "wavelength": 550, "value": 4097 },
+    { "name": "FY", "wavelength": 555, "value": 30209 },
+    { "name": "FXL", "wavelength": 600, "value": 56321 },
+    { "name": "F6", "wavelength": 640, "value": 22530 },
+    { "name": "F7", "wavelength": 690, "value": 47874 },
+    { "name": "F8", "wavelength": 745, "value": 25600 },
+    { "name": "NIR", "wavelength": 855, "value": 9472 }
+  ]
+}
