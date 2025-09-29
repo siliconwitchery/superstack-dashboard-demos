@@ -1,15 +1,9 @@
 import {
   renderAir,
-  updateAir,
   renderPower,
-  updatePower,
   renderSpect,
   renderBin,
 } from "./charts.js";
-
-///////////////////
-// New logic
-///////////////////
 
 let apiKey = null;
 let deploymentId = null;
@@ -39,14 +33,14 @@ async function fetchFromApi2(currentType, apiKey, deploymentId) {
   if (res.ok) {
     setConnectionStatus(true);
     return await res.json();
+  }else {
+    setConnectionStatus(false);
   }
 
 }
 
-// Timer loop which keeps updating the graphs
 function startTimerLoop() {
   setInterval(async () => {
-
     apiKey = document.getElementById("apiKey").value.trim();
     deploymentId = document.getElementById("deploymentId").value.trim();
 
@@ -62,54 +56,46 @@ function Closealltabs() {
 }
 
 async function loadLatest(type) {
-  // console.log(`Loading latest data for ${type} with apikey=${apiKey} depid=${deploymentId}`);
-
   let deviceName;
-  if (type === "power") {
-    deviceName = "Power Meter";
-  } else if (type === "airquality") {
-    deviceName = "air_quality";
-  } else if (type === "spectrometer") {
-    deviceName = "Spectrometer";
-  } else if (type === "binsensor") {
-    deviceName = "Bin Sensor";
-  }
 
-const allData = await fetchFromApi2(deviceName, apiKey, deploymentId);
+  //All in one place
+  if (type === "power") deviceName = "Power Meter";
+  else if (type === "airquality") deviceName = "Air Quality Sensor"; 
+  else if (type === "spectrometer") deviceName = "Spectrometer";
+  else if (type === "binsensor") deviceName = "Bin Sensor";
+
+  const allData = await fetchFromApi2(deviceName, apiKey, deploymentId);
+  const fetchTime = new Date().toLocaleString();
 
   if (!allData || allData.length === 0) {
-    console.warn("No device data yet for", deviceName);
+    console.warn("No device data for", deviceName);
+    show(type, { data: {} }, fetchTime);
     return;
   }
 
   const entry = allData[allData.length - 1];
-  show(type, entry);
+  show(type, entry, fetchTime);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll(".menu-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
       const type = btn.parentElement.dataset.type;
-
+      Closealltabs();
       if (type === "settings") {
-        Closealltabs();
         document.getElementById("settingsPage").style.display = "block";
       } else if (type === "airquality") {
-        Closealltabs();
         document.getElementById("airqualityPage").style.display = "block";
-        loadLatest("airquality", false);
+        loadLatest("airquality");
       } else if (type === "power") {
-        Closealltabs();
         document.getElementById("powerPage").style.display = "block";
-        loadLatest("power", false);
+        loadLatest("power");
       } else if (type === "spectrometer") {
-        Closealltabs();
         document.getElementById("spectrometerPage").style.display = "block";
-        loadLatest("spectrometer", false);
+        loadLatest("spectrometer");
       } else if (type === "binsensor") {
-        Closealltabs();
         document.getElementById("binsensorPage").style.display = "block";
-        loadLatest("binsensor", false);
+        loadLatest("binsensor");
       }
       currentType = type;
     });
@@ -130,9 +116,7 @@ function setConnectionStatus(connected) {
   }
 }
 
-function show(type, entry) {
-  const fetchTime = new Date().toLocaleString();
-
+function show(type, entry, fetchTime) {
   if (type === "airquality") {
     document.getElementById("airqualityPage").style.display = "block";
     document.getElementById("fanStatus").textContent =
@@ -146,10 +130,9 @@ function show(type, entry) {
       co2_unit: "ppm",
       total_volatile_compounds: entry.data?.total_volatile_compounds || 0,
       voc_unit: "ppb",
-    });
-  }
+    }, fetchTime);
 
-  else if (type === "power") {
+  } else if (type === "power") {
     document.getElementById("powerPage").style.display = "block";
     document.getElementById("fetchTimePower").textContent = fetchTime;
 
@@ -157,27 +140,20 @@ function show(type, entry) {
       voltage: { value: entry.data?.voltage || 0, unit: "V" },
       current: { value: entry.data?.current || 0, unit: "A" },
       power: { value: entry.data?.power || 0, unit: "W" },
-    });
-  }
+    }, fetchTime);
 
-  else if (type === "spectrometer") {
+  } else if (type === "spectrometer") {
     document.getElementById("spectrometerPage").style.display = "block";
     document.getElementById("fetchTimeSpect").textContent = fetchTime;
 
     renderSpect(entry.data || {}, fetchTime);
-  }
 
-  else if (type === "binsensor") {
+  } else if (type === "binsensor") {
     document.getElementById("binsensorPage").style.display = "block";
     document.getElementById("fetchTimeBin").textContent = fetchTime;
 
-    if (entry.data) {
-      renderBin(entry.data);
-    } else {
-      document.getElementById("binFill").style.height = "0%";
-    }
+    renderBin(entry.data || {}, fetchTime);
   }
 }
 
-// Start the timer loop
 startTimerLoop();
