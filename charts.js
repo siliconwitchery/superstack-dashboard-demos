@@ -189,8 +189,9 @@ function makeSpectrumChart(canvasId) {
     }
   });
 }
+let MAX_COUNT = 65535
 
-function updateSpectrum(valuesByNm, maxCount = 65535) {
+function updateSpectrum(valuesByNm, maxCount) {
   if (!charts.spectrum) return;
 
   const amp = (nm) => (valuesByNm[nm] || 0) / maxCount;
