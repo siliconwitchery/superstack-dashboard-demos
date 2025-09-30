@@ -1,13 +1,12 @@
 let charts = {};
 
-// -------------------- Gauge needle plugin --------------------
 const gaugeNeedle = {
   id: "gaugeNeedle",
   afterDatasetDraw(chart) {
     const dataset = chart.config.data.datasets[0];
     const { ctx } = chart;
     const value = (dataset.currentValue || 0).toFixed(2);
-    const maxValue = (dataset.maxValue || 1).toFixed(2);
+    const maxValue = (dataset.maxValue || 0).toFixed(0);
 
     const angle = (Math.PI * dataset.currentValue) / dataset.maxValue;
     const cx = chart.width / 2;
@@ -27,18 +26,12 @@ const gaugeNeedle = {
     ctx.restore();
 
     ctx.font = "16px Arial";
-    ctx.fillStyle = "black";
-    ctx.textAlign = "center";
     ctx.fillText(`${value} ${dataset.unit || ""}`, cx, chart.height - 20);
 
     const endAngle = Math.PI;
-    const endX = cx + Math.cos(endAngle) * r + 230;
+    const endX = cx + Math.cos(endAngle) * r + 240;
     const endY = cy + Math.sin(endAngle) * r + 20;
-
-    ctx.font = "14px Arial";
-    ctx.fillStyle = "gray";
-    ctx.textAlign = "center";
-    ctx.fillText(`${maxValue} ${dataset.unit || ""}`, endX, endY - 5);
+    ctx.fillText(`${maxValue}`, endX, endY - 5);
   },
 };
 
@@ -62,8 +55,8 @@ function makeGauge(canvasId, maxValue, unit) {
     options: {
       cutout: "70%",
       responsive: false,
-      animation: false,
-      plugins: { legend: { display: false }, tooltip: { enabled: false } },
+      animation: true,
+      plugins: { legend: { display: false }, position: 'top', tooltip: { enabled: false } },
     },
     plugins: [gaugeNeedle],
   });
