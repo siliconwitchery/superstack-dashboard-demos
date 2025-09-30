@@ -64,17 +64,16 @@
   z-index: 1000;
   transition: all 0.3s ease;
 }
-
 .status-indicator.connected {
   background: #4caf50;
   color: white;
 }
-
 .status-indicator.not-connected {
   background: #f44336;
   color: white;
 }
 
+/* Spectrometer */
 #colorBox {
   width: 140px;
   height: 48px;
@@ -82,9 +81,51 @@
   border: 1px solid #ccc;
   border-radius: 4px;
 }
+
+.status-legend {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 4px 0 8px;
+  color: #333;
+  font-weight: 600;
+}
+.status-legend .legend-item span {
+  font-size: 18px;
+  margin-right: 6px;
+}
+
+.channel-status {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(58px, auto);
+  gap: 10px;
+  justify-content: center;
+  align-items: end;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  margin: 6px 0 10px;
+}
+.status-item {
+  display: grid;
+  place-items: center;
+}
+.status-item .emoji {
+  font-size: 22px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.status-item .chip {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+}
+
 .chart-wrap {
-  max-width: 980px;
-  height: 380px;
+  max-width: 720px;
+  height: 460px;
   margin: 10px auto 0;
 }
 #spectrumChart {

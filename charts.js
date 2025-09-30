@@ -89,6 +89,12 @@ function wavelengthToColor(wl) {
   b = Math.round(Math.max(0, Math.min(1, b)) * 255);
   return `rgb(${r},${g},${b})`;
 }
+function textColorFor(rgb) {
+  const m = rgb.match(/\d+/g) || [0, 0, 0];
+  const [r, g, b] = m.map(Number);
+  const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b; 
+  return luma > 160 ? "#000" : "#fff";
+}
 
 const SPECTRUM_CHANNELS = [
   { name: "F1", peak: 405, fwhm: 30 },
@@ -105,11 +111,19 @@ const SPECTRUM_CHANNELS = [
   { name: "NIR", peak: 855, fwhm: 54 }
 ];
 
-// Acceptable ranges for badges (nm)
 const CHANNEL_ACCEPT_RANGES = {
   F1: { min: 395, max: 415 },
   F2: { min: 415, max: 435 },
-  F3: { min: 465, max: 485 }
+  FZ: { min: 440, max: 460 },
+  F3: { min: 465, max: 485 },
+  F4: { min: 505, max: 525 },
+  F5: { min: 540, max: 560 },
+  FY: { min: 545, max: 565 },
+  FXL: { min: 590, max: 610 },
+  F6: { min: 630, max: 650 },
+  F7: { min: 680, max: 700 },
+  F8: { min: 735, max: 755 },
+  NIR: { min: 845, max: 865 }
 };
 
 function gaussianAt(x, mean, fwhm) {
@@ -120,17 +134,6 @@ function gaussianAt(x, mean, fwhm) {
 
 function extractSpectrumValues(raw) {
   if (!raw) return null;
-
-  if (Array.isArray(raw.channels)) {
-    const map = {};
-    raw.channels.forEach((c) => {
-      if (typeof c.wavelength === "number" && typeof c.value === "number") {
-        map[Math.round(c.wavelength)] = c.value;
-      }
-    });
-    return Object.keys(map).length ? map : null;
-  }
-
   const obj = raw.data || raw;
   if (obj && typeof obj === "object") {
     const map = {};
@@ -140,7 +143,7 @@ function extractSpectrumValues(raw) {
         map[Number(m[1])] = obj[k];
       }
     });
-    if (Object.keys(map).length) return map;
+    return map;
   }
   return null;
 }
@@ -166,15 +169,12 @@ function makeSpectrumChart(canvasId) {
         y: {
           min: 0,
           max: 1,
-          title: {
-            display: true,
-            text: "spectral responsivity (scaled)"
-          },
+          title: { display: true, text: "spectral responsivity (scaled)" },
           grid: { color: "rgba(0,0,0,0.08)" }
         }
       },
       plugins: {
-        legend: { display: true, position: "top" },
+        legend: { display: false }, 
         tooltip: {
           callbacks: {
             label(ctx) {
@@ -215,10 +215,10 @@ function updateSpectrum(valuesByNm, maxCount = 65535) {
     };
   });
 
-  const samples = Object.keys(valuesByNm)
-    .map((k) => Number(k))
-    .sort((a, b) => a - b)
-    .map((wl) => ({ x: wl, y: (valuesByNm[wl] || 0) / maxCount }));
+  const samples = SPECTRUM_CHANNELS.map((ch) => ({
+    x: ch.peak,
+    y: amp(ch.peak)
+  }));
 
   const samplesDataset = {
     label: "Samples",
@@ -238,31 +238,54 @@ function updateSpectrum(valuesByNm, maxCount = 65535) {
   charts.spectrum.update();
 }
 
-function setBadge(id, ok) {
+function ensureStatusRow() {
+  const container =
+    document.getElementById("channelStatusRow") ||
+    document.querySelector(".channel-status");
+  if (!container || container.dataset.built === "1") return;
+
+  container.innerHTML = "";
+  SPECTRUM_CHANNELS.forEach((ch) => {
+    const item = document.createElement("div");
+    item.className = "status-item";
+
+    const emoji = document.createElement("span");
+    emoji.id = `status${ch.name}`;
+    emoji.className = "emoji";
+    emoji.textContent = "❌";
+
+    const chip = document.createElement("span");
+    chip.className = "chip";
+    const bg = wavelengthToColor(ch.peak);
+    chip.style.background = bg;
+    chip.style.color = textColorFor(bg);
+    chip.textContent = ch.name;
+
+    item.appendChild(emoji);
+    item.appendChild(chip);
+    container.appendChild(item);
+  });
+
+  container.dataset.built = "1";
+}
+
+function setEmoji(id, ok) {
   const el = document.getElementById(id);
   if (!el) return;
-  el.textContent = ok ? "true" : "false";
-  el.classList.remove("true", "false");
-  el.classList.add(ok ? "true" : "false");
+  el.textContent = ok ? "✅" : "❌";
 }
 
 function updateChannelBadges(wavelengthNm) {
-  if (typeof wavelengthNm !== "number" || Number.isNaN(wavelengthNm)) return;
-  setBadge(
-    "f1Status",
-    wavelengthNm >= CHANNEL_ACCEPT_RANGES.F1.min &&
-      wavelengthNm <= CHANNEL_ACCEPT_RANGES.F1.max
-  );
-  setBadge(
-    "f2Status",
-    wavelengthNm >= CHANNEL_ACCEPT_RANGES.F2.min &&
-      wavelengthNm <= CHANNEL_ACCEPT_RANGES.F2.max
-  );
-  setBadge(
-    "f3Status",
-    wavelengthNm >= CHANNEL_ACCEPT_RANGES.F3.min &&
-      wavelengthNm <= CHANNEL_ACCEPT_RANGES.F3.max
-  );
+  if (!Number.isFinite(wavelengthNm)) {
+    Object.keys(CHANNEL_ACCEPT_RANGES).forEach((name) =>
+      setEmoji(`status${name}`, false)
+    );
+    return;
+  }
+  Object.entries(CHANNEL_ACCEPT_RANGES).forEach(([name, range]) => {
+    const ok = wavelengthNm >= range.min && wavelengthNm <= range.max;
+    setEmoji(`status${name}`, ok);
+  });
 }
 
 export function renderAir(d, fetchTime) {
@@ -298,60 +321,48 @@ export function renderPower(d, fetchTime) {
 }
 
 export function renderSpect(d, fetchTime) {
+  ensureStatusRow();
   if (!charts.spectrum) {
     const canvas = document.getElementById("spectrumChart");
     if (canvas) charts.spectrum = makeSpectrumChart("spectrumChart");
   }
 
   const values = extractSpectrumValues(d);
-  const wlFromPayload =
-    typeof d?.wavelength === "number" ? Number(d.wavelength) : null;
 
-  const apply = (map, maxCount = 65535) => {
-    updateSpectrum(map, maxCount);
+  if (!values || Object.keys(values).length === 0) {
+    updateSpectrum({}, MAX_COUNT);
+    const box = document.getElementById("colorBox");
+    if (box) box.style.background = "#eee";
+    const wlText = document.getElementById("wavelengthText");
+    if (wlText) wlText.textContent = "No spectrometer data";
+    updateChannelBadges(NaN);
+    document.getElementById("resultText").textContent = " ";
+    if (fetchTime)
+      document.getElementById("fetchTimeSpect").textContent = fetchTime;
+    return;
+  }
 
-    const peakWl =
-      Object.entries(map).reduce(
-        (best, [k, v]) => (v > best.v ? { wl: Number(k), v } : best),
-        { wl: 0, v: -1 }
-      ).wl || 0;
+  updateSpectrum(values, MAX_COUNT);
 
-    const uiWl = wlFromPayload ?? peakWl;
+  const peakWl =
+    Object.entries(values).reduce(
+      (best, [k, v]) => (v > best.v ? { wl: Number(k), v } : best),
+      { wl: 0, v: -1 }
+    ).wl || 0;
 
-    document.getElementById("colorBox").style.background =
-      wavelengthToColor(uiWl);
-    document.getElementById(
-      "wavelengthText"
-    ).textContent = `Measured wavelength: ${uiWl} nm`;
+  document.getElementById("colorBox").style.background =
+    wavelengthToColor(peakWl);
+  document.getElementById(
+    "wavelengthText"
+  ).textContent = `Measured wavelength: ${peakWl} nm`;
 
-    // Per-channel true/false for F1–F3
-    updateChannelBadges(uiWl);
+  updateChannelBadges(peakWl);
 
-    // Keep old single PASS check for F1 range
-    document.getElementById("resultText").textContent =
-      uiWl >= 395 && uiWl <= 410 ? "PASS ✅" : " ";
-  };
+  document.getElementById("resultText").textContent =
+    peakWl >= 395 && peakWl <= 410 ? "PASS ✅" : " ";
 
-  if (values) {
-    apply(values, d.maxCount || 65535);
-  } else {
-    fetch("data/colors.json")
-      .then((r) => r.json())
-      .then((json) => {
-        const map =
-          extractSpectrumValues(json) ||
-          (Array.isArray(json.channels)
-            ? json.channels.reduce((acc, c) => {
-                acc[Math.round(c.wavelength)] = c.value;
-                return acc;
-              }, {})
-            : extractSpectrumValues(json.data));
-        apply(map || {}, json.maxCount || 65535);
-      })
-      .catch(() => {});
-   }
-
-  if (fetchTime) document.getElementById("fetchTimeSpect").textContent = fetchTime;
+  if (fetchTime)
+    document.getElementById("fetchTimeSpect").textContent = fetchTime;
 }
 
 export function renderBin(d, fetchTime) {
