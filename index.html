@@ -1,35 +1,219 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <link rel="stylesheet" href="styles.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module" src="main.js"></script>
-    <script src="charts.js" defer></script>
-  </head>
-  <body>
-    <div id="connectionStatus" class="status-indicator">Not Connected</div>
-    <div class="layout">
-      <div class="sidebar">
-        <div class="menu-section" data-type="airquality">
-          <button class="menu-btn">Air Quality</button>
-        </div>
-        <div class="menu-section" data-type="power">
-          <button class="menu-btn">Power</button>
-        </div>
-        <div class="menu-section" data-type="spectrometer">
-          <button class="menu-btn">Spectrometer</button>
-        </div>
-        <div class="menu-section" data-type="binsensor">
-          <button class="menu-btn">Bin</button>
-        </div>
-        <div class="menu-section" data-type="settings">
-          <button class="menu-btn">Settings</button>
-        </div>
+
+<head>
+  <meta charset="utf-8">
+
+  <!-- Web app metadata -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#fbf8fd" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Superstack" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+  <!-- Title & description -->
+  <title>Superstack Dashboard Demo</title>
+  <meta name="description"
+    content="This single page webapp shows how easy it is to get started with making a dynamic dashboard for your deployment.">
+  <link rel="canonical" href="https://demos.siliconwitchery.com" />
+
+  <!-- Styling -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/beercss@3.7.12/dist/cdn/beer.min.css">
+  <script type="module" src="https://cdn.jsdelivr.net/npm/beercss@3.7.12/dist/cdn/beer.min.js"></script>
+  <script type="module"
+    src="https://cdn.jsdelivr.net/npm/material-dynamic-colors@1.1.2/dist/cdn/material-dynamic-colors.min.js"></script>
+
+  <!-- Charting -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+
+  <!-- Map -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+  <!-- App logic -->
+  <script type="module" src="main.js"></script>
+
+</head>
+
+<body class="dark">
+
+  <!-- Header bar -->
+  <header>
+    <nav class="right-align middle-align no-margin">
+
+      <!-- Title -->
+      <div class="l m">
+        <h4 class="small">Superstack Dashboard Demo</h4>
       </div>
-      <div class="main">
-        <h1>Silicon Witchery Panel</h1>
-        <div id="contentArea"></div>
+
+      <div class="s">
+        <h4 class="small">Dashboard Demo</h4>
+      </div>
+
+      <!-- Gap -->
+      <div class="max"></div>
+
+      <!-- Connected icon -->
+      <button id="connection-status-chip" class="chip error">Disconnected</button>
+
+    </nav>
+  </header>
+
+  <!-- Main body -->
+  <main>
+
+    <!-- Navigation bar -->
+    <nav class="left surface-container-low" style="margin-top: 64px;">
+
+      <a data-ui="#air-quality-tab">
+        <i>air</i>
+        <div class="l m">Air Quality</div>
+      </a>
+
+      <a data-ui="#power-meter-tab">
+        <i>electrical_services</i>
+        <div class="l m">Power Meter</div>
+      </a>
+
+      <a data-ui="#color-sensor-tab">
+        <i>palette</i>
+        <div class="l m">Color Sensor</div>
+      </a>
+
+      <a data-ui="#trash-level-tab">
+        <i>delete</i>
+        <div class="l m">Trash Level</div>
+      </a>
+
+      <a data-ui="#settings-tab" class="active">
+        <i>settings</i>
+        <div class="l m">Settings</div>
+      </a>
+    </nav>
+
+    <!-- Air Quality Tab -->
+    <div class="page" id="air-quality-tab">
+      <div class="grid" style="margin: 12px 24px 12px 24px;">
+
+        <div class="l3 m6 s12">
+          <fieldset>
+            <legend>Air Quality <strong><span id="air-quality-index-value"></span></strong></legend>
+            <canvas id="air-quality-index-chart" style="max-width:100%;"></canvas>
+          </fieldset>
+        </div>
+
+        <div class="l3 m6 s12">
+          <fieldset>
+            <legend>Carbon Dioxide <strong><span id="air-quality-co2-value"></span></strong></legend>
+            <canvas id="air-quality-co2-chart" style="max-width:100%;"></canvas>
+          </fieldset>
+        </div>
+
+        <div class="l3 m6 s12">
+          <fieldset>
+            <legend>Volatile Compounds <strong><span id="air-quality-voc-value"></span></strong></legend>
+            <canvas id="air-quality-voc-chart" style="max-width:100%;"></canvas>
+          </fieldset>
+        </div>
+
+        <div class="l3 m6 s12">
+          <fieldset>
+            <legend>Humidity <strong><span id="air-quality-humidity-value"></span></strong></legend>
+            <canvas id="air-quality-humidity-chart" style="max-width:100%;"></canvas>
+          </fieldset>
+        </div>
+
       </div>
     </div>
-  </body>
+
+    <!-- Power Meter Tab -->
+    <div class="page" id="power-meter-tab">
+      <div class="grid" style="margin: 12px 24px 12px 24px;">
+
+        <div class="l4 m4 s12">
+          <fieldset>
+            <legend>Voltage <strong><span id="power-meter-voltage-value"></span></strong></legend>
+            <canvas id="power-meter-voltage-chart" style="max-width:100%;"></canvas>
+          </fieldset>
+        </div>
+
+        <div class="l4 m4 s12">
+          <fieldset>
+            <legend>Current <strong><span id="power-meter-current-value"></span></strong></legend>
+            <canvas id="power-meter-current-chart" style="max-width:100%;"></canvas>
+          </fieldset>
+        </div>
+
+        <div class="l4 m4 s12">
+          <fieldset>
+            <legend>Power <strong><span id="power-meter-power-value"></span></strong></legend>
+            <canvas id="power-meter-power-chart" style="max-width:100%;"></canvas>
+          </fieldset>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Color Sensor Tab -->
+    <div class="page" id="color-sensor-tab">
+      <div class="grid" style="margin: 12px 24px 12px 24px;">
+
+        <div class="l12 m12 s12">
+          <fieldset>
+            <legend>Spectrum</legend>
+            <canvas id="color-sensor-spectrum-chart" style="max-width:100%;"></canvas>
+          </fieldset>
+        </div>
+
+        <div class="l12 m12 s12">
+          <fieldset>
+            <legend>Check</legend>
+          </fieldset>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Trash Level Tab -->
+    <div class="page" id="trash-level-tab">
+      <div class="grid" style="margin: 12px 24px 12px 24px;">
+
+        <div class="l12 m12 s12">
+          <fieldset>
+            <legend>Level <strong><span id="trash-level-value"></span></strong></legend>
+            <canvas id="trash-level-chart" style="max-width:100%;"></canvas>
+          </fieldset>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="page active" id="settings-tab">
+      <fieldset style="margin: 12px 24px 12px 24px;">
+
+        <legend>Deployment</legend>
+
+        <div class="field border label">
+          <input id="settings-deployment-id-field" value="2b549e58-b05b-4a24-8266-2843b6538de6">
+          <label>Deployment ID</label>
+        </div>
+
+        <div class="field border label">
+          <input id="settings-api-key-field" value="Jc9kdtAMoNiQcao-SDQvg8dtZ33HoWkHFJmjhnY5Mu4">
+          <label>API Key</label>
+        </div>
+
+        <span class="helper">Dashboard connects automatically once all fields are entered</span>
+
+      </fieldset>
+    </div>
+
+  </main>
+
+</body>
+
 </html>
