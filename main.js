@@ -121,6 +121,7 @@ setInterval(async () => {
       document.getElementById("power-meter-voltage-value").textContent = dataPoint.data.voltage.toFixed(2) + "V";
       document.getElementById("power-meter-current-value").textContent = dataPoint.data.current.toFixed(2) + "A";
       document.getElementById("power-meter-power-value").textContent = dataPoint.data.power.toFixed(2) + "W";
+
     }
 
     if (dataPoint.device_name == "Color Sensor" && !colorSensorUpdated) {
