@@ -12,8 +12,8 @@ let currentType = null;
 async function fetchFromApi2(currentType, apiKey, deploymentId) {
 
   const start = new Date();
-  start.setDate(start.getDate() - 20);
-  // start.setSeconds(start.getSeconds() - 10);
+  // start.setDate(start.getDate() - 20);
+  start.setSeconds(start.getSeconds() - 10);
 
   const payload = {
     deploymentId: deploymentId,
@@ -21,7 +21,7 @@ async function fetchFromApi2(currentType, apiKey, deploymentId) {
     time: { start: start.toISOString().replace("Z", "+00:00") },
   };
 
-  const res = await fetch("https://super.siliconwitchery.com/api/data", {
+  const res = await fetch("https://superdev.siliconwitchery.com/api/data", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -124,7 +124,7 @@ function show(type, entry, fetchTime) {
     document.getElementById("fetchTimeAir").textContent = fetchTime;
 
     renderAir({
-      air_quality: entry.data?.airquality || 0,
+      air_quality: entry.data?.air_quality || 0,
       air_quality_unit: "",
       equivalent_CO2: entry.data?.equivalent_CO2 || 0,
       co2_unit: "ppm",

@@ -112,18 +112,18 @@ const SPECTRUM_CHANNELS = [
 ];
 
 const CHANNEL_ACCEPT_RANGES = {
-  F1: { min: 395, max: 415 },
-  F2: { min: 415, max: 435 },
-  FZ: { min: 440, max: 460 },
-  F3: { min: 465, max: 485 },
-  F4: { min: 505, max: 525 },
-  F5: { min: 540, max: 560 },
-  FY: { min: 545, max: 565 },
-  FXL: { min: 590, max: 610 },
-  F6: { min: 630, max: 650 },
-  F7: { min: 680, max: 700 },
-  F8: { min: 735, max: 755 },
-  NIR: { min: 845, max: 865 }
+  405: { min: 758, max: 778 },
+  425: { min: 2806, max: 2826 },
+  450: { min: 15862, max: 15882 },
+  475: { min: 15350, max: 15370 },
+  515: { min: 45558, max: 45578 },
+  550: { min: 15094, max: 15114 },
+  555: { min: 4830, max: 4850 },
+  600: { min: 35574, max: 35594 },
+  640: { min: 23030, max: 23050 },
+  690: { min: 10742, max: 10762 },
+  745: { min: 1782, max: 1802 },
+  855: { min: 1526, max: 1546 }
 };
 
 function gaussianAt(x, mean, fwhm) {
@@ -276,16 +276,22 @@ function setEmoji(id, ok) {
   el.textContent = ok ? "✅" : "❌";
 }
 
-function updateChannelBadges(wavelengthNm) {
-  if (!Number.isFinite(wavelengthNm)) {
-    Object.keys(CHANNEL_ACCEPT_RANGES).forEach((name) =>
-      setEmoji(`status${name}`, false)
+function updateChannelBadgesFromCounts(valuesByNm) {
+  if (!valuesByNm || typeof valuesByNm !== "object") {
+    SPECTRUM_CHANNELS.forEach((ch) =>
+      setEmoji(`status${ch.name}`, false)
     );
     return;
   }
-  Object.entries(CHANNEL_ACCEPT_RANGES).forEach(([name, range]) => {
-    const ok = wavelengthNm >= range.min && wavelengthNm <= range.max;
-    setEmoji(`status${name}`, ok);
+  console.log(valuesByNm);
+  SPECTRUM_CHANNELS.forEach((ch) => {
+    const wl = ch.peak;
+    const range = CHANNEL_ACCEPT_RANGES[wl];
+    const raw = valuesByNm[wl] ?? valuesByNm[String(wl)];
+    const val = Number(raw);
+    const ok =
+      Number.isFinite(val) && range && val >= range.min && val <= range.max;
+  setEmoji(`status${ch.name}`, ok);
   });
 }
 
@@ -336,7 +342,7 @@ export function renderSpect(d, fetchTime) {
     if (box) box.style.background = "#eee";
     const wlText = document.getElementById("wavelengthText");
     if (wlText) wlText.textContent = "No spectrometer data";
-    updateChannelBadges(NaN);
+    updateChannelBadgesFromCounts(null);
     document.getElementById("resultText").textContent = " ";
     if (fetchTime)
       document.getElementById("fetchTimeSpect").textContent = fetchTime;
@@ -344,6 +350,7 @@ export function renderSpect(d, fetchTime) {
   }
 
   updateSpectrum(values, MAX_COUNT);
+  console.log(values);
 
   const peakWl =
     Object.entries(values).reduce(
@@ -351,13 +358,8 @@ export function renderSpect(d, fetchTime) {
       { wl: 0, v: -1 }
     ).wl || 0;
 
-  document.getElementById("colorBox").style.background =
-    wavelengthToColor(peakWl);
-  document.getElementById(
-    "wavelengthText"
-  ).textContent = `Measured wavelength: ${peakWl} nm`;
 
-  updateChannelBadges(peakWl);
+  updateChannelBadgesFromCounts(values);
 
   document.getElementById("resultText").textContent =
     peakWl >= 395 && peakWl <= 410 ? "PASS ✅" : " ";
