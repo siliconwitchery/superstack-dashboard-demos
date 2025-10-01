@@ -1,9 +1,25 @@
 import {
-  renderAir,
-  renderPower,
-  renderSpect,
-  renderBin,
-} from "./charts.js";
+  airQualityChart,
+  airQualityCo2Chart,
+  airQualityVocChart,
+  airQualityHumidityChart,
+  powerMeterVoltageChart,
+  powerMeterCurrentChart,
+  powerMeterPowerChart,
+  colorSensorSpectrumChart,
+  trashLevelChart,
+} from "./chart-settings.js";
+
+// Render the charts
+airQualityChart.update();
+airQualityCo2Chart.update();
+airQualityVocChart.update();
+airQualityHumidityChart.update();
+powerMeterVoltageChart.update();
+powerMeterCurrentChart.update();
+powerMeterPowerChart.update();
+colorSensorSpectrumChart.update();
+trashLevelChart.update();
 
 let apiKey = null;
 let deploymentId = null;
@@ -17,7 +33,7 @@ async function fetchFromApi2(currentType, apiKey, deploymentId) {
 
   const payload = {
     deploymentId: deploymentId,
-    devices:[currentType],
+    devices: [currentType],
     time: { start: start.toISOString().replace("Z", "+00:00") },
   };
 
@@ -33,7 +49,7 @@ async function fetchFromApi2(currentType, apiKey, deploymentId) {
   if (res.ok) {
     setConnectionStatus(true);
     return await res.json();
-  }else {
+  } else {
     setConnectionStatus(false);
   }
 
@@ -41,8 +57,8 @@ async function fetchFromApi2(currentType, apiKey, deploymentId) {
 
 function startTimerLoop() {
   setInterval(async () => {
-    apiKey = document.getElementById("apiKey").value.trim();
-    deploymentId = document.getElementById("deploymentId").value.trim();
+    apiKey = document.getElementById("settings-api-key-field").value.trim();
+    deploymentId = document.getElementById("settings-deployment-id-field").value.trim();
 
     loadLatest(currentType);
 
@@ -60,7 +76,7 @@ async function loadLatest(type) {
 
   //All in one place
   if (type === "power") deviceName = "Power Meter";
-  else if (type === "airquality") deviceName = "Air Quality Sensor"; 
+  else if (type === "airquality") deviceName = "Air Quality Sensor";
   else if (type === "spectrometer") deviceName = "Spectrometer";
   else if (type === "binsensor") deviceName = "Bin Sensor";
 
@@ -103,16 +119,16 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function setConnectionStatus(connected) {
-  const statusEl = document.getElementById("connectionStatus");
+  const statusEl = document.getElementById("connection-status-chip");
   if (!statusEl) return;
   if (connected) {
     statusEl.textContent = "Connected";
-    statusEl.classList.remove("not-connected");
-    statusEl.classList.add("connected");
+    statusEl.classList.remove("error");
+    statusEl.classList.add("primary");
   } else {
-    statusEl.textContent = "Not Connected";
-    statusEl.classList.remove("connected");
-    statusEl.classList.add("not-connected");
+    statusEl.textContent = "Disconnected";
+    statusEl.classList.remove("primary");
+    statusEl.classList.add("error");
   }
 }
 
