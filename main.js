@@ -1,5 +1,5 @@
 import {
-  airQualityChart,
+  airQualityIndexChart,
   airQualityCo2Chart,
   airQualityVocChart,
   airQualityHumidityChart,
@@ -10,8 +10,11 @@ import {
   trashLevelChart,
 } from "./chart-settings.js";
 
+// TODO remove this
+import { getDummyData } from "./dummy-data.js"
+
 // Render the charts
-airQualityChart.update();
+airQualityIndexChart.update();
 airQualityCo2Chart.update();
 airQualityVocChart.update();
 airQualityHumidityChart.update();
@@ -21,155 +24,131 @@ powerMeterPowerChart.update();
 colorSensorSpectrumChart.update();
 trashLevelChart.update();
 
-let apiKey = null;
-let deploymentId = null;
-let currentType = null;
+// Timer loop which fetches data from the Superstack API every second
+setInterval(async () => {
 
-async function fetchFromApi2(currentType, apiKey, deploymentId) {
+  // Get the deployment ID and API from the settings page
+  let deploymentId = document.getElementById("settings-deployment-id-field").value.trim();
+  let apiKey = document.getElementById("settings-api-key-field").value.trim();
 
-  const start = new Date();
-  start.setDate(start.getDate() - 20);
-  // start.setSeconds(start.getSeconds() - 10);
+  // Get recent device data from the API
+  const startTime = new Date();
+  startTime.setSeconds(startTime.getMinutes() - 60);
 
-  const payload = {
+  const requestPayload = {
     deploymentId: deploymentId,
-    devices: [currentType],
-    time: { start: start.toISOString().replace("Z", "+00:00") },
+    time: { start: startTime.toISOString().replace("Z", "+00:00") },
   };
 
-  const res = await fetch("https://super.siliconwitchery.com/api/data", {
+  const requestResponse = await fetch("https://super.siliconwitchery.com/api/data", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "X-Api-Key": apiKey,
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(requestPayload),
   });
 
-  if (res.ok) {
-    setConnectionStatus(true);
-    return await res.json();
-  } else {
-    setConnectionStatus(false);
+  // Update the connection button based on response
+  const connectionStatusChip = document.getElementById("connection-status-chip");
+
+  if (!requestResponse.ok) {
+    connectionStatusChip.textContent = "Disconnected";
+    connectionStatusChip.classList.remove("primary");
+    connectionStatusChip.classList.add("error");
+
+    // If no response, don't go any further
+    return
   }
 
-}
+  connectionStatusChip.textContent = "Connected";
+  connectionStatusChip.classList.remove("error");
+  connectionStatusChip.classList.add("primary");
 
-function startTimerLoop() {
-  setInterval(async () => {
-    apiKey = document.getElementById("settings-api-key-field").value.trim();
-    deploymentId = document.getElementById("settings-deployment-id-field").value.trim();
+  // Parse the response data into JSON
+  let responseJson = await requestResponse.json();
 
-    loadLatest(currentType);
+  // Work backwards through the response data and update each graph
+  let airQualityUpdated = false;
+  let powerMeterUpdated = false;
+  let colorSensorUpdated = false;
+  let trashLevelUpdated = false;
 
-  }, 1000);
-}
+  // TODO switch this to real data
+  // for (const dataPoint of responseJson.reverse()) {
+  for (const dataPoint of getDummyData().reverse()) {
 
-function Closealltabs() {
-  document
-    .querySelectorAll("#Closealltabs section")
-    .forEach((sec) => (sec.style.display = "none"));
-}
+    if (dataPoint.device_name == "Air Quality Sensors" && !airQualityUpdated) {
+      airQualityUpdated = true
 
-async function loadLatest(type) {
-  let deviceName;
+      airQualityIndexChart.data.datasets[0].data[0] = (300 / 10) * dataPoint.data.air_quality_index;
+      airQualityIndexChart.data.datasets[0].data[1] = 300 - airQualityIndexChart.data.datasets[0].data[0];
+      airQualityIndexChart.update()
 
-  //All in one place
-  if (type === "power") deviceName = "Power Meter";
-  else if (type === "airquality") deviceName = "Air Quality Sensor";
-  else if (type === "spectrometer") deviceName = "Spectrometer";
-  else if (type === "binsensor") deviceName = "Bin Sensor";
+      airQualityCo2Chart.data.datasets[0].data[0] = (300 / 1000) * dataPoint.data.carbon_dioxide;
+      airQualityCo2Chart.data.datasets[0].data[1] = 300 - airQualityCo2Chart.data.datasets[0].data[0];
+      airQualityCo2Chart.update()
 
-  const allData = await fetchFromApi2(deviceName, apiKey, deploymentId);
-  const fetchTime = new Date().toLocaleString();
+      airQualityVocChart.data.datasets[0].data[0] = (300 / 1000) * dataPoint.data.volatile_compounds;
+      airQualityVocChart.data.datasets[0].data[1] = 300 - airQualityVocChart.data.datasets[0].data[0];
+      airQualityVocChart.update()
 
-  if (!allData || allData.length === 0) {
-    console.warn("No device data for", deviceName);
-    show(type, { data: {} }, fetchTime);
-    return;
+      airQualityHumidityChart.data.datasets[0].data[0] = (300 / 100) * dataPoint.data.humidity;
+      airQualityHumidityChart.data.datasets[0].data[1] = 300 - airQualityHumidityChart.data.datasets[0].data[0];
+      airQualityHumidityChart.update()
+
+      document.getElementById("air-quality-index-value").textContent = dataPoint.data.air_quality_index.toFixed(0);
+      document.getElementById("air-quality-co2-value").textContent = dataPoint.data.carbon_dioxide.toFixed(0) + "ppm";
+      document.getElementById("air-quality-voc-value").textContent = dataPoint.data.volatile_compounds.toFixed(0) + "ppm";
+      document.getElementById("air-quality-humidity-value").textContent = dataPoint.data.humidity.toFixed(0) + "%";
+    }
+
+    if (dataPoint.device_name == "Power Meter" && !powerMeterUpdated) {
+      powerMeterUpdated = true
+
+      powerMeterVoltageChart.data.datasets[0].data[0] = (300 / 24) * dataPoint.data.voltage;
+      powerMeterVoltageChart.data.datasets[0].data[1] = 300 - powerMeterVoltageChart.data.datasets[0].data[0];
+      powerMeterVoltageChart.update()
+
+      powerMeterCurrentChart.data.datasets[0].data[0] = (300 / 3) * dataPoint.data.current;
+      powerMeterCurrentChart.data.datasets[0].data[1] = 300 - powerMeterCurrentChart.data.datasets[0].data[0];
+      powerMeterCurrentChart.update()
+
+      powerMeterPowerChart.data.datasets[0].data[0] = (300 / 45) * dataPoint.data.power;
+      powerMeterPowerChart.data.datasets[0].data[1] = 300 - powerMeterCurrentChart.data.datasets[0].data[0];
+      powerMeterPowerChart.update()
+
+      document.getElementById("power-meter-voltage-value").textContent = dataPoint.data.voltage.toFixed(2) + "V";
+      document.getElementById("power-meter-current-value").textContent = dataPoint.data.current.toFixed(2) + "A";
+      document.getElementById("power-meter-power-value").textContent = dataPoint.data.power.toFixed(2) + "W";
+    }
+
+    if (dataPoint.device_name == "Color Sensor" && !colorSensorUpdated) {
+      colorSensorUpdated = true
+
+      colorSensorSpectrumChart.data.datasets[0].data[0] = (100 / 65536) * dataPoint.data["405"];
+      colorSensorSpectrumChart.data.datasets[0].data[1] = (100 / 65536) * dataPoint.data["425"];
+      colorSensorSpectrumChart.data.datasets[0].data[2] = (100 / 65536) * dataPoint.data["450"];
+      colorSensorSpectrumChart.data.datasets[0].data[3] = (100 / 65536) * dataPoint.data["475"];
+      colorSensorSpectrumChart.data.datasets[0].data[4] = (100 / 65536) * dataPoint.data["515"];
+      colorSensorSpectrumChart.data.datasets[0].data[5] = (100 / 65536) * dataPoint.data["555"];
+      colorSensorSpectrumChart.data.datasets[0].data[6] = (100 / 65536) * dataPoint.data["550"];
+      colorSensorSpectrumChart.data.datasets[0].data[7] = (100 / 65536) * dataPoint.data["600"];
+      colorSensorSpectrumChart.data.datasets[0].data[8] = (100 / 65536) * dataPoint.data["640"];
+      colorSensorSpectrumChart.data.datasets[0].data[9] = (100 / 65536) * dataPoint.data["690"];
+      colorSensorSpectrumChart.data.datasets[0].data[10] = (100 / 65536) * dataPoint.data["745"];
+      colorSensorSpectrumChart.data.datasets[0].data[11] = (100 / 65536) * dataPoint.data["855"];
+      colorSensorSpectrumChart.update()
+    }
+
+    if (dataPoint.device_name == "Trash Level Sensor" && !trashLevelUpdated) {
+      trashLevelUpdated = true
+
+      trashLevelChart.data.datasets[0].data[0] = (100 / 74) * dataPoint.data.trash_level;
+      trashLevelChart.update()
+
+      document.getElementById("trash-level-value").textContent = dataPoint.data.trash_level.toFixed(0) + "cm / 74cm";
+    }
+
   }
-
-  const entry = allData[allData.length - 1];
-  show(type, entry, fetchTime);
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  document.querySelectorAll(".menu-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const type = btn.parentElement.dataset.type;
-      Closealltabs();
-      if (type === "settings") {
-        document.getElementById("settingsPage").style.display = "block";
-      } else if (type === "airquality") {
-        document.getElementById("airqualityPage").style.display = "block";
-        loadLatest("airquality");
-      } else if (type === "power") {
-        document.getElementById("powerPage").style.display = "block";
-        loadLatest("power");
-      } else if (type === "spectrometer") {
-        document.getElementById("spectrometerPage").style.display = "block";
-        loadLatest("spectrometer");
-      } else if (type === "binsensor") {
-        document.getElementById("binsensorPage").style.display = "block";
-        loadLatest("binsensor");
-      }
-      currentType = type;
-    });
-  });
-});
-
-function setConnectionStatus(connected) {
-  const statusEl = document.getElementById("connection-status-chip");
-  if (!statusEl) return;
-  if (connected) {
-    statusEl.textContent = "Connected";
-    statusEl.classList.remove("error");
-    statusEl.classList.add("primary");
-  } else {
-    statusEl.textContent = "Disconnected";
-    statusEl.classList.remove("primary");
-    statusEl.classList.add("error");
-  }
-}
-
-function show(type, entry, fetchTime) {
-  if (type === "airquality") {
-    document.getElementById("airqualityPage").style.display = "block";
-    document.getElementById("fanStatus").textContent =
-      entry.data?.fan ? "On" : "Off";
-    document.getElementById("fetchTimeAir").textContent = fetchTime;
-
-    renderAir({
-      air_quality: entry.data?.airquality || 0,
-      air_quality_unit: "",
-      equivalent_CO2: entry.data?.equivalent_CO2 || 0,
-      co2_unit: "ppm",
-      total_volatile_compounds: entry.data?.total_volatile_compounds || 0,
-      voc_unit: "ppb",
-    }, fetchTime);
-
-  } else if (type === "power") {
-    document.getElementById("powerPage").style.display = "block";
-    document.getElementById("fetchTimePower").textContent = fetchTime;
-
-    renderPower({
-      voltage: { value: entry.data?.voltage || 0, unit: "V" },
-      current: { value: entry.data?.current || 0, unit: "A" },
-      power: { value: entry.data?.power || 0, unit: "W" },
-    }, fetchTime);
-
-  } else if (type === "spectrometer") {
-    document.getElementById("spectrometerPage").style.display = "block";
-    document.getElementById("fetchTimeSpect").textContent = fetchTime;
-
-    renderSpect(entry.data || {}, fetchTime);
-
-  } else if (type === "binsensor") {
-    document.getElementById("binsensorPage").style.display = "block";
-    document.getElementById("fetchTimeBin").textContent = fetchTime;
-
-    renderBin(entry.data || {}, fetchTime);
-  }
-}
-
-startTimerLoop();
+}, 1000);
