@@ -13,16 +13,9 @@ import {
 // Simulated data that is used when there's no connection
 import { getSimulatedData } from "./simulated-data.js"
 
-// Render the charts
-airQualityIndexChart.update();
-airQualityCo2Chart.update();
-airQualityVocChart.update();
-airQualityHumidityChart.update();
-powerMeterVoltageChart.update();
-powerMeterCurrentChart.update();
-powerMeterPowerChart.update();
-colorSensorSpectrumChart.update();
-trashLevelChart.update();
+// References to dynamic elements on the page
+const connectionStatusChip = document.getElementById("connection-status-chip")
+const simulatedDataNotice = document.getElementById("simulated-data-notice")
 
 // Timer loop which fetches data from the Superstack API every second
 setInterval(async () => {
@@ -33,7 +26,7 @@ setInterval(async () => {
 
   // Get recent device data from the API
   const startTime = new Date();
-  startTime.setSeconds(startTime.setSeconds() - 10);
+  startTime.setSeconds(startTime.getSeconds() - 10);
 
   const requestPayload = {
     deploymentId: deploymentId,
@@ -49,27 +42,35 @@ setInterval(async () => {
     body: JSON.stringify(requestPayload),
   });
 
-  // Update the connection button based on response
-  const connectionStatusChip = document.getElementById("connection-status-chip");
-  var data
+  // If the request was successful, parse out the json
+  let data
 
   if (requestResponse.ok) {
-    connectionStatusChip.textContent = "Connected";
-    connectionStatusChip.classList.remove("error");
-    connectionStatusChip.classList.add("primary");
-    document.getElementById("simulated-data-notice").style.display = "none";
-
-    // Use real data if connected
     data = await requestResponse.json()
+  }
 
-  } else {
+  // Based on the response, update the HTML and fallback to simulated data if needed
+  if (!requestResponse.ok) {
     connectionStatusChip.textContent = "Disconnected";
     connectionStatusChip.classList.remove("primary");
     connectionStatusChip.classList.add("error");
-    document.getElementById("simulated-data-notice").style.display = "block";
-
-    // Otherwise use simulated data
+    simulatedDataNotice.style.display = "block";
     data = getSimulatedData().reverse()
+  }
+
+  else if (data.length === 0) {
+    connectionStatusChip.textContent = "Devices offline";
+    connectionStatusChip.classList.remove("primary");
+    connectionStatusChip.classList.add("error");
+    simulatedDataNotice.style.display = "block";
+    data = getSimulatedData().reverse()
+  }
+
+  else {
+    connectionStatusChip.textContent = "Connected";
+    connectionStatusChip.classList.remove("error");
+    connectionStatusChip.classList.add("primary");
+    simulatedDataNotice.style.display = "none";
   }
 
   // Work backwards through the response data and update each graph
@@ -80,7 +81,7 @@ setInterval(async () => {
 
   for (const dataPoint of data) {
 
-    if (dataPoint.device_name == "Air Quality Sensors" && !airQualityUpdated) {
+    if (dataPoint.device_name === "Air Quality Sensors" && !airQualityUpdated) {
       airQualityUpdated = true
 
       airQualityIndexChart.data.datasets[0].data[0] = (300 / 10) * dataPoint.data.air_quality_index;
@@ -105,7 +106,7 @@ setInterval(async () => {
       document.getElementById("air-quality-humidity-value").textContent = dataPoint.data.humidity.toFixed(0) + "%";
     }
 
-    if (dataPoint.device_name == "Power Meter" && !powerMeterUpdated) {
+    if (dataPoint.device_name === "Power Meter" && !powerMeterUpdated) {
       powerMeterUpdated = true
 
       powerMeterVoltageChart.data.datasets[0].data[0] = (300 / 24) * dataPoint.data.voltage;
@@ -126,7 +127,7 @@ setInterval(async () => {
 
     }
 
-    if (dataPoint.device_name == "Color Sensor" && !colorSensorUpdated) {
+    if (dataPoint.device_name === "Color Sensor" && !colorSensorUpdated) {
       colorSensorUpdated = true
 
       colorSensorSpectrumChart.data.datasets[0].data[0] = (100 / 65536) * dataPoint.data["405"];
@@ -144,7 +145,7 @@ setInterval(async () => {
       colorSensorSpectrumChart.update()
     }
 
-    if (dataPoint.device_name == "Trash Level Sensor" && !trashLevelUpdated) {
+    if (dataPoint.device_name === "Trash Level Sensor" && !trashLevelUpdated) {
       trashLevelUpdated = true
 
       trashLevelChart.data.datasets[0].data[0] = (100 / 74) * dataPoint.data.trash_level;
