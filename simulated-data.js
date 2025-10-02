@@ -1,4 +1,4 @@
-export function getDummyData() {
+export function getSimulatedData() {
     return [
         {
             "device_name": "Air Quality Sensors",

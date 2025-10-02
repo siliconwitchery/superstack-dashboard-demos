@@ -10,8 +10,8 @@ import {
   trashLevelChart,
 } from "./chart-settings.js";
 
-// TODO remove this
-import { getDummyData } from "./dummy-data.js"
+// Simulated data that is used when there's no connection
+import { getSimulatedData } from "./simulated-data.js"
 
 // Render the charts
 airQualityIndexChart.update();
@@ -27,13 +27,13 @@ trashLevelChart.update();
 // Timer loop which fetches data from the Superstack API every second
 setInterval(async () => {
 
-  // Get the deployment ID and API from the settings page
+  // Get the deployment ID and API key from the settings page
   let deploymentId = document.getElementById("settings-deployment-id-field").value.trim();
   let apiKey = document.getElementById("settings-api-key-field").value.trim();
 
   // Get recent device data from the API
   const startTime = new Date();
-  startTime.setSeconds(startTime.getMinutes() - 60);
+  startTime.setSeconds(startTime.setSeconds() - 10);
 
   const requestPayload = {
     deploymentId: deploymentId,
@@ -51,22 +51,26 @@ setInterval(async () => {
 
   // Update the connection button based on response
   const connectionStatusChip = document.getElementById("connection-status-chip");
+  var data
 
-  if (!requestResponse.ok) {
+  if (requestResponse.ok) {
+    connectionStatusChip.textContent = "Connected";
+    connectionStatusChip.classList.remove("error");
+    connectionStatusChip.classList.add("primary");
+    document.getElementById("simulated-data-notice").style.display = "none";
+
+    // Use real data if connected
+    data = await requestResponse.json()
+
+  } else {
     connectionStatusChip.textContent = "Disconnected";
     connectionStatusChip.classList.remove("primary");
     connectionStatusChip.classList.add("error");
+    document.getElementById("simulated-data-notice").style.display = "block";
 
-    // If no response, don't go any further
-    return
+    // Otherwise use simulated data
+    data = getSimulatedData().reverse()
   }
-
-  connectionStatusChip.textContent = "Connected";
-  connectionStatusChip.classList.remove("error");
-  connectionStatusChip.classList.add("primary");
-
-  // Parse the response data into JSON
-  let responseJson = await requestResponse.json();
 
   // Work backwards through the response data and update each graph
   let airQualityUpdated = false;
@@ -74,9 +78,7 @@ setInterval(async () => {
   let colorSensorUpdated = false;
   let trashLevelUpdated = false;
 
-  // TODO switch this to real data
-  // for (const dataPoint of responseJson.reverse()) {
-  for (const dataPoint of getDummyData().reverse()) {
+  for (const dataPoint of data) {
 
     if (dataPoint.device_name == "Air Quality Sensors" && !airQualityUpdated) {
       airQualityUpdated = true
@@ -115,7 +117,7 @@ setInterval(async () => {
       powerMeterCurrentChart.update()
 
       powerMeterPowerChart.data.datasets[0].data[0] = (300 / 45) * dataPoint.data.power;
-      powerMeterPowerChart.data.datasets[0].data[1] = 300 - powerMeterCurrentChart.data.datasets[0].data[0];
+      powerMeterPowerChart.data.datasets[0].data[1] = 300 - powerMeterPowerChart.data.datasets[0].data[0];
       powerMeterPowerChart.update()
 
       document.getElementById("power-meter-voltage-value").textContent = dataPoint.data.voltage.toFixed(2) + "V";

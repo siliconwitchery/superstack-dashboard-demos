@@ -39,7 +39,7 @@ Only **two external libraries** are used:
 - `index.html` – Main HTML file with UI structure
 - `main.js` – Core application logic and data fetching
 - `chart-settings.js` – Chart configuration and setup
-
+- `simulated-data.js` - Data that is used to render the graphs while not connected
 
 ### Key Components
 
