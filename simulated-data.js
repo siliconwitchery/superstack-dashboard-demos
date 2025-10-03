@@ -6,9 +6,9 @@ export function getSimulatedData() {
             "timestamp": "2025-10-01T12:53:27.105791Z",
             "data_uuid": "3d521ded-8f65-44c1-a446-e19ae6e0ac78",
             "data": {
-                "humidity": 28 + (Math.random() * 5),
+                "humidity": 28 + (Math.random() * 0.5),
                 "carbon_dioxide": 301 + (Math.random() * 12),
-                "air_quality_index": 3.004554271697998 + (Math.random()),
+                "air_quality_index": 1 + (Math.random() * 0.2),
                 "volatile_compounds": 58 + (Math.random() * 10)
             }
         },

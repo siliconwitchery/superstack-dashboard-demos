@@ -84,15 +84,15 @@ setInterval(async () => {
     if (dataPoint.device_name === "Air Quality Sensors" && !airQualityUpdated) {
       airQualityUpdated = true
 
-      airQualityIndexChart.data.datasets[0].data[0] = (300 / 10) * dataPoint.data.air_quality_index;
+      airQualityIndexChart.data.datasets[0].data[0] = (300 / 5) * dataPoint.data.air_quality_index;
       airQualityIndexChart.data.datasets[0].data[1] = 300 - airQualityIndexChart.data.datasets[0].data[0];
       airQualityIndexChart.update()
 
-      airQualityCo2Chart.data.datasets[0].data[0] = (300 / 1000) * dataPoint.data.carbon_dioxide;
+      airQualityCo2Chart.data.datasets[0].data[0] = (300 / 2000) * dataPoint.data.carbon_dioxide;
       airQualityCo2Chart.data.datasets[0].data[1] = 300 - airQualityCo2Chart.data.datasets[0].data[0];
       airQualityCo2Chart.update()
 
-      airQualityVocChart.data.datasets[0].data[0] = (300 / 1000) * dataPoint.data.volatile_compounds;
+      airQualityVocChart.data.datasets[0].data[0] = (300 / 2000) * dataPoint.data.volatile_compounds;
       airQualityVocChart.data.datasets[0].data[1] = 300 - airQualityVocChart.data.datasets[0].data[0];
       airQualityVocChart.update()
 
@@ -102,7 +102,7 @@ setInterval(async () => {
 
       document.getElementById("air-quality-index-value").textContent = dataPoint.data.air_quality_index.toFixed(0);
       document.getElementById("air-quality-co2-value").textContent = dataPoint.data.carbon_dioxide.toFixed(0) + "ppm";
-      document.getElementById("air-quality-voc-value").textContent = dataPoint.data.volatile_compounds.toFixed(0) + "ppm";
+      document.getElementById("air-quality-voc-value").textContent = dataPoint.data.volatile_compounds.toFixed(0) + "ppb";
       document.getElementById("air-quality-humidity-value").textContent = dataPoint.data.humidity.toFixed(0) + "%";
     }
 
