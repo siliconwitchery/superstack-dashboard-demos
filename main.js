@@ -13,10 +13,6 @@ import {
 // Simulated data that is used when there's no connection
 import { getSimulatedData } from "./simulated-data.js"
 
-// References to dynamic elements on the page
-const connectionStatusChip = document.getElementById("connection-status-chip")
-const simulatedDataNotice = document.getElementById("simulated-data-notice")
-
 // Timer loop which fetches data from the Superstack API every second
 setInterval(async () => {
 
@@ -50,6 +46,9 @@ setInterval(async () => {
   }
 
   // Based on the response, update the HTML and fallback to simulated data if needed
+  const connectionStatusChip = document.getElementById("connection-status-chip")
+  const simulatedDataNotice = document.getElementById("simulated-data-notice")
+
   if (!requestResponse.ok) {
     connectionStatusChip.textContent = "Disconnected";
     connectionStatusChip.classList.remove("primary");
@@ -143,6 +142,19 @@ setInterval(async () => {
       colorSensorSpectrumChart.data.datasets[0].data[10] = (100 / 65536) * dataPoint.data["745"];
       colorSensorSpectrumChart.data.datasets[0].data[11] = (100 / 65536) * dataPoint.data["855"];
       colorSensorSpectrumChart.update()
+
+      document.getElementById("color_check_405nm").textContent = dataPoint.data["405"] > 1000 && dataPoint.data["405"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_425nm").textContent = dataPoint.data["425"] > 1000 && dataPoint.data["425"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_450nm").textContent = dataPoint.data["450"] > 1000 && dataPoint.data["450"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_475nm").textContent = dataPoint.data["475"] > 1000 && dataPoint.data["475"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_515nm").textContent = dataPoint.data["515"] > 1000 && dataPoint.data["515"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_550nm").textContent = dataPoint.data["550"] > 1000 && dataPoint.data["550"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_555nm").textContent = dataPoint.data["555"] > 1000 && dataPoint.data["555"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_600nm").textContent = dataPoint.data["600"] > 1000 && dataPoint.data["600"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_640nm").textContent = dataPoint.data["640"] > 1000 && dataPoint.data["640"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_690nm").textContent = dataPoint.data["690"] > 1000 && dataPoint.data["690"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_745nm").textContent = dataPoint.data["745"] > 1000 && dataPoint.data["745"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_855nm").textContent = dataPoint.data["855"] > 1000 && dataPoint.data["855"] < 2000 ? "✅" : "❌";
     }
 
     if (dataPoint.device_name === "Trash Level Sensor" && !trashLevelUpdated) {
