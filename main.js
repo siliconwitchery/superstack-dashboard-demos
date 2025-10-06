@@ -129,32 +129,32 @@ setInterval(async () => {
     if (dataPoint.device_name === "Color Sensor" && !colorSensorUpdated) {
       colorSensorUpdated = true
 
-      colorSensorSpectrumChart.data.datasets[0].data[0] = (100 / 65536) * dataPoint.data["405"];
-      colorSensorSpectrumChart.data.datasets[0].data[1] = (100 / 65536) * dataPoint.data["425"];
-      colorSensorSpectrumChart.data.datasets[0].data[2] = (100 / 65536) * dataPoint.data["450"];
-      colorSensorSpectrumChart.data.datasets[0].data[3] = (100 / 65536) * dataPoint.data["475"];
-      colorSensorSpectrumChart.data.datasets[0].data[4] = (100 / 65536) * dataPoint.data["515"];
-      colorSensorSpectrumChart.data.datasets[0].data[5] = (100 / 65536) * dataPoint.data["555"];
-      colorSensorSpectrumChart.data.datasets[0].data[6] = (100 / 65536) * dataPoint.data["550"];
-      colorSensorSpectrumChart.data.datasets[0].data[7] = (100 / 65536) * dataPoint.data["600"];
-      colorSensorSpectrumChart.data.datasets[0].data[8] = (100 / 65536) * dataPoint.data["640"];
-      colorSensorSpectrumChart.data.datasets[0].data[9] = (100 / 65536) * dataPoint.data["690"];
-      colorSensorSpectrumChart.data.datasets[0].data[10] = (100 / 65536) * dataPoint.data["745"];
-      colorSensorSpectrumChart.data.datasets[0].data[11] = (100 / 65536) * dataPoint.data["855"];
+      colorSensorSpectrumChart.data.datasets[0].data[0] = (100 / 65536) * dataPoint.data["405nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[1] = (100 / 65536) * dataPoint.data["425nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[2] = (100 / 65536) * dataPoint.data["450nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[3] = (100 / 65536) * dataPoint.data["475nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[4] = (100 / 65536) * dataPoint.data["515nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[5] = (100 / 65536) * dataPoint.data["555nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[6] = (100 / 65536) * dataPoint.data["550nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[7] = (100 / 65536) * dataPoint.data["600nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[8] = (100 / 65536) * dataPoint.data["640nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[9] = (100 / 65536) * dataPoint.data["690nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[10] = (100 / 65536) * dataPoint.data["745nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[11] = (100 / 65536) * dataPoint.data["855nm"];
       colorSensorSpectrumChart.update()
 
-      document.getElementById("color_check_405nm").textContent = dataPoint.data["405"] > 1000 && dataPoint.data["405"] < 2000 ? "✅" : "❌";
-      document.getElementById("color_check_425nm").textContent = dataPoint.data["425"] > 1000 && dataPoint.data["425"] < 2000 ? "✅" : "❌";
-      document.getElementById("color_check_450nm").textContent = dataPoint.data["450"] > 1000 && dataPoint.data["450"] < 2000 ? "✅" : "❌";
-      document.getElementById("color_check_475nm").textContent = dataPoint.data["475"] > 1000 && dataPoint.data["475"] < 2000 ? "✅" : "❌";
-      document.getElementById("color_check_515nm").textContent = dataPoint.data["515"] > 1000 && dataPoint.data["515"] < 2000 ? "✅" : "❌";
-      document.getElementById("color_check_550nm").textContent = dataPoint.data["550"] > 1000 && dataPoint.data["550"] < 2000 ? "✅" : "❌";
-      document.getElementById("color_check_555nm").textContent = dataPoint.data["555"] > 1000 && dataPoint.data["555"] < 2000 ? "✅" : "❌";
-      document.getElementById("color_check_600nm").textContent = dataPoint.data["600"] > 1000 && dataPoint.data["600"] < 2000 ? "✅" : "❌";
-      document.getElementById("color_check_640nm").textContent = dataPoint.data["640"] > 1000 && dataPoint.data["640"] < 2000 ? "✅" : "❌";
-      document.getElementById("color_check_690nm").textContent = dataPoint.data["690"] > 1000 && dataPoint.data["690"] < 2000 ? "✅" : "❌";
-      document.getElementById("color_check_745nm").textContent = dataPoint.data["745"] > 1000 && dataPoint.data["745"] < 2000 ? "✅" : "❌";
-      document.getElementById("color_check_855nm").textContent = dataPoint.data["855"] > 1000 && dataPoint.data["855"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_405nm").textContent = dataPoint.data["405nm"] > 1000 && dataPoint.data["405nm"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_425nm").textContent = dataPoint.data["425nm"] > 1000 && dataPoint.data["425nm"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_450nm").textContent = dataPoint.data["450nm"] > 1000 && dataPoint.data["450nm"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_475nm").textContent = dataPoint.data["475nm"] > 1000 && dataPoint.data["475nm"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_515nm").textContent = dataPoint.data["515nm"] > 1000 && dataPoint.data["515nm"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_550nm").textContent = dataPoint.data["550nm"] > 1000 && dataPoint.data["550nm"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_555nm").textContent = dataPoint.data["555nm"] > 1000 && dataPoint.data["555nm"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_600nm").textContent = dataPoint.data["600nm"] > 1000 && dataPoint.data["600nm"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_640nm").textContent = dataPoint.data["640nm"] > 1000 && dataPoint.data["640nm"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_690nm").textContent = dataPoint.data["690nm"] > 1000 && dataPoint.data["690nm"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_745nm").textContent = dataPoint.data["745nm"] > 1000 && dataPoint.data["745nm"] < 2000 ? "✅" : "❌";
+      document.getElementById("color_check_855nm").textContent = dataPoint.data["855nm"] > 1000 && dataPoint.data["855nm"] < 2000 ? "✅" : "❌";
     }
 
     if (dataPoint.device_name === "Trash Level Sensor" && !trashLevelUpdated) {
