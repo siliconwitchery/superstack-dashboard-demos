@@ -54,7 +54,7 @@ setInterval(async () => {
     connectionStatusChip.classList.remove("primary");
     connectionStatusChip.classList.add("error");
     simulatedDataNotice.style.display = "block";
-    data = getSimulatedData().reverse()
+    data = getSimulatedData()
   }
 
   else if (data.length === 0) {
@@ -62,7 +62,7 @@ setInterval(async () => {
     connectionStatusChip.classList.remove("primary");
     connectionStatusChip.classList.add("error");
     simulatedDataNotice.style.display = "block";
-    data = getSimulatedData().reverse()
+    data = getSimulatedData()
   }
 
   else {
@@ -78,7 +78,7 @@ setInterval(async () => {
   let colorSensorUpdated = false;
   let trashLevelUpdated = false;
 
-  for (const dataPoint of data) {
+  for (const dataPoint of data.reverse()) {
 
     if (dataPoint.device_name === "Air Quality Sensors" && !airQualityUpdated) {
       airQualityUpdated = true
