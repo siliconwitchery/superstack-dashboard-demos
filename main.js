@@ -160,10 +160,10 @@ setInterval(async () => {
     if (dataPoint.device_name === "Trash Level Sensor" && !trashLevelUpdated) {
       trashLevelUpdated = true
 
-      trashLevelChart.data.datasets[0].data[0] = (100 / 74) * dataPoint.data.trash_level;
+      trashLevelChart.data.datasets[0].data[0] = dataPoint.data.trash_level;
       trashLevelChart.update()
 
-      document.getElementById("trash-level-value").textContent = dataPoint.data.trash_level.toFixed(0) + "cm / 74cm";
+      document.getElementById("trash-level-value").textContent = dataPoint.data.trash_level.toFixed(0) + "cm";
     }
 
   }
