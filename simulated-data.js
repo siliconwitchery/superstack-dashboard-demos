@@ -29,18 +29,18 @@ export function getSimulatedData() {
             "timestamp": "2025-10-01T12:57:21.160993Z",
             "data_uuid": "3b678867-2500-46d0-b403-113ff396e3dc",
             "data": {
-                "405": 829 + (Math.random() * 2000),
-                "425": 2875 + (Math.random() * 2000),
-                "450": 15901 + (Math.random() * 2000),
-                "475": 15296 + (Math.random() * 2000),
-                "515": 45650 + (Math.random() * 2000),
-                "550": 49031 + (Math.random() * 2000),
-                "555": 15542 + (Math.random() * 2000),
-                "600": 35854 + (Math.random() * 2000),
-                "640": 23189 + (Math.random() * 2000),
-                "690": 10920 + (Math.random() * 2000),
-                "745": 1958 + (Math.random() * 2000),
-                "855": 1622 + (Math.random() * 2000)
+                "405nm": 829 + (Math.random() * 2000),
+                "425nm": 2875 + (Math.random() * 2000),
+                "450nm": 15901 + (Math.random() * 2000),
+                "475nm": 15296 + (Math.random() * 2000),
+                "515nm": 45650 + (Math.random() * 2000),
+                "550nm": 49031 + (Math.random() * 2000),
+                "555nm": 15542 + (Math.random() * 2000),
+                "600nm": 35854 + (Math.random() * 2000),
+                "640nm": 23189 + (Math.random() * 2000),
+                "690nm": 10920 + (Math.random() * 2000),
+                "745nm": 1958 + (Math.random() * 2000),
+                "855nm": 1622 + (Math.random() * 2000)
             }
         },
         {
