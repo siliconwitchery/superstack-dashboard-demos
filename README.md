@@ -11,6 +11,8 @@ This single-page web application demonstrates how to build a live dashboard for 
 - **Color Sensor** - Light spectrum analysis across multiple wavelengths
 - **Trash Level Sensor** - Fill level monitoring
 
+To see the code running on each device, check out the Superstack deployment [here](https://super.siliconwitchery.com/?deployment=2b549e58-b05b-4a24-8266-2843b6538de6).
+
 ## Architecture
 
 The entire dashboard is built with just **two main files**:
