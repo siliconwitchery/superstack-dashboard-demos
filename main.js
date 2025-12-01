@@ -11,10 +11,13 @@ import {
 } from "./chart-settings.js";
 
 // Simulated data that is used when there's no connection
-import { getSimulatedData } from "./simulated-data.js"
+import { getSimulatedData } from "./simulated-data.js";
 
 // Timer loop which fetches data from the Superstack API every second
 setInterval(async () => {
+
+  // We'll fallback to simulated data if there isn't fresh data, or of the request fails
+  let data = getSimulatedData();
 
   // Get the deployment ID and API key from the settings page
   let deploymentId = document.getElementById("settings-deployment-id-field").value.trim();
@@ -24,52 +27,47 @@ setInterval(async () => {
   const startTime = new Date();
   startTime.setSeconds(startTime.getSeconds() - 10);
 
-  const requestPayload = {
-    deploymentId: deploymentId,
-    time: { start: startTime.toISOString().replace("Z", "+00:00") },
-  };
+  const filters = encodeURIComponent(JSON.stringify(
+    {
+      startTime: startTime.toISOString(),
+    }));
 
-  const requestResponse = await fetch("https://super.siliconwitchery.com/api/data", {
-    method: "POST",
+  const requestResponse = await fetch(`https://super.siliconwitchery.com/api/${deploymentId}/data?filters=${filters}`, {
+    method: "GET",
     headers: {
-      "Content-Type": "application/json",
       "X-Api-Key": apiKey,
     },
-    body: JSON.stringify(requestPayload),
   });
 
-  // If the request was successful, parse out the json
-  let data
-
-  if (requestResponse.ok) {
-    data = await requestResponse.json()
-  }
+  // Parse out the json
+  const responseJson = await requestResponse.json();
 
   // Based on the response, update the HTML and fallback to simulated data if needed
-  const connectionStatusChip = document.getElementById("connection-status-chip")
-  const simulatedDataNotice = document.getElementById("simulated-data-notice")
+  const connectionStatusText = document.getElementById("connection-status-text");
+  const connectionStatusChip = document.getElementById("connection-status-chip");
+  const simulatedDataNotice = document.getElementById("simulated-data-notice");
 
   if (!requestResponse.ok) {
-    connectionStatusChip.textContent = "Disconnected";
+    connectionStatusText.textContent = "Disconnected";
     connectionStatusChip.classList.remove("primary");
     connectionStatusChip.classList.add("error");
     simulatedDataNotice.style.display = "block";
-    data = getSimulatedData()
+    console.log(responseJson);
   }
 
-  else if (data.length === 0) {
-    connectionStatusChip.textContent = "Devices offline";
+  else if (responseJson.data.length === 0) {
+    connectionStatusText.textContent = "Devices offline";
     connectionStatusChip.classList.remove("primary");
     connectionStatusChip.classList.add("error");
     simulatedDataNotice.style.display = "block";
-    data = getSimulatedData()
   }
 
   else {
-    connectionStatusChip.textContent = "Connected";
+    connectionStatusText.textContent = "Connected";
     connectionStatusChip.classList.remove("error");
     connectionStatusChip.classList.add("primary");
     simulatedDataNotice.style.display = "none";
+    data = responseJson.data; // Use real data
   }
 
   // Work backwards through the response data and update each graph
@@ -80,24 +78,24 @@ setInterval(async () => {
 
   for (const dataPoint of data.reverse()) {
 
-    if (dataPoint.device_name === "Air Quality Sensors" && !airQualityUpdated) {
-      airQualityUpdated = true
+    if (dataPoint.device === "Air Quality Sensors" && !airQualityUpdated) {
+      airQualityUpdated = true;
 
       airQualityIndexChart.data.datasets[0].data[0] = (300 / 5) * dataPoint.data.air_quality_index;
       airQualityIndexChart.data.datasets[0].data[1] = 300 - airQualityIndexChart.data.datasets[0].data[0];
-      airQualityIndexChart.update()
+      airQualityIndexChart.update();
 
-      airQualityCo2Chart.data.datasets[0].data[0] = (300 / 2000) * dataPoint.data.carbon_dioxide;
+      airQualityCo2Chart.data.datasets[0].data[0] = (300 / 3000) * dataPoint.data.carbon_dioxide;
       airQualityCo2Chart.data.datasets[0].data[1] = 300 - airQualityCo2Chart.data.datasets[0].data[0];
-      airQualityCo2Chart.update()
+      airQualityCo2Chart.update();
 
-      airQualityVocChart.data.datasets[0].data[0] = (300 / 2000) * dataPoint.data.volatile_compounds;
+      airQualityVocChart.data.datasets[0].data[0] = (300 / 10000) * dataPoint.data.volatile_compounds;
       airQualityVocChart.data.datasets[0].data[1] = 300 - airQualityVocChart.data.datasets[0].data[0];
-      airQualityVocChart.update()
+      airQualityVocChart.update();
 
       airQualityHumidityChart.data.datasets[0].data[0] = (300 / 100) * dataPoint.data.humidity;
       airQualityHumidityChart.data.datasets[0].data[1] = 300 - airQualityHumidityChart.data.datasets[0].data[0];
-      airQualityHumidityChart.update()
+      airQualityHumidityChart.update();
 
       document.getElementById("air-quality-index-value").textContent = dataPoint.data.air_quality_index.toFixed(0);
       document.getElementById("air-quality-co2-value").textContent = dataPoint.data.carbon_dioxide.toFixed(0) + "ppm";
@@ -105,20 +103,20 @@ setInterval(async () => {
       document.getElementById("air-quality-humidity-value").textContent = dataPoint.data.humidity.toFixed(0) + "%";
     }
 
-    if (dataPoint.device_name === "Power Meter" && !powerMeterUpdated) {
-      powerMeterUpdated = true
+    if (dataPoint.device === "Power Meter" && !powerMeterUpdated) {
+      powerMeterUpdated = true;
 
       powerMeterVoltageChart.data.datasets[0].data[0] = (300 / 24) * dataPoint.data.voltage;
       powerMeterVoltageChart.data.datasets[0].data[1] = 300 - powerMeterVoltageChart.data.datasets[0].data[0];
-      powerMeterVoltageChart.update()
+      powerMeterVoltageChart.update();
 
       powerMeterCurrentChart.data.datasets[0].data[0] = (300 / 3) * dataPoint.data.current;
       powerMeterCurrentChart.data.datasets[0].data[1] = 300 - powerMeterCurrentChart.data.datasets[0].data[0];
-      powerMeterCurrentChart.update()
+      powerMeterCurrentChart.update();
 
       powerMeterPowerChart.data.datasets[0].data[0] = (300 / 45) * dataPoint.data.power;
       powerMeterPowerChart.data.datasets[0].data[1] = 300 - powerMeterPowerChart.data.datasets[0].data[0];
-      powerMeterPowerChart.update()
+      powerMeterPowerChart.update();
 
       document.getElementById("power-meter-voltage-value").textContent = dataPoint.data.voltage.toFixed(2) + "V";
       document.getElementById("power-meter-current-value").textContent = dataPoint.data.current.toFixed(2) + "A";
@@ -126,8 +124,8 @@ setInterval(async () => {
 
     }
 
-    if (dataPoint.device_name === "Color Sensor" && !colorSensorUpdated) {
-      colorSensorUpdated = true
+    if (dataPoint.device === "Color Sensor" && !colorSensorUpdated) {
+      colorSensorUpdated = true;
 
       colorSensorSpectrumChart.data.datasets[0].data[0] = (100 / 65536) * dataPoint.data["405nm"];
       colorSensorSpectrumChart.data.datasets[0].data[1] = (100 / 65536) * dataPoint.data["425nm"];
@@ -141,11 +139,11 @@ setInterval(async () => {
       colorSensorSpectrumChart.data.datasets[0].data[9] = (100 / 65536) * dataPoint.data["690nm"];
       colorSensorSpectrumChart.data.datasets[0].data[10] = (100 / 65536) * dataPoint.data["745nm"];
       colorSensorSpectrumChart.data.datasets[0].data[11] = (100 / 65536) * dataPoint.data["855nm"];
-      colorSensorSpectrumChart.update()
+      colorSensorSpectrumChart.update();
 
       // Helper function to determine if value is in a certain range
       function within(data, target, range) {
-        return target - data >= -range && target - data <= range
+        return target - data >= -range && target - data <= range;
       }
 
       document.getElementById("color_check_405nm").textContent = within(dataPoint.data["405nm"], 3840, 1500) ? "✅" : "❌";
@@ -162,14 +160,22 @@ setInterval(async () => {
       document.getElementById("color_check_855nm").textContent = within(dataPoint.data["855nm"], 4608, 1500) ? "✅" : "❌";
     }
 
-    if (dataPoint.device_name === "Trash Level Sensor" && !trashLevelUpdated) {
-      trashLevelUpdated = true
+    if (dataPoint.device === "Trash Level Sensor" && !trashLevelUpdated) {
+      trashLevelUpdated = true;
 
       trashLevelChart.data.datasets[0].data[0] = dataPoint.data.trash_level;
-      trashLevelChart.update()
+      trashLevelChart.update();
 
       document.getElementById("trash-level-value").textContent = dataPoint.data.trash_level.toFixed(0) + "cm";
     }
 
   }
-}, 1000);
+}, 500);
+
+// Open the deployment in Superstack when the user clicks the button
+document.getElementById('connection-status-chip')
+  .addEventListener('click', async function () {
+    const deploymentId = document.getElementById('settings-deployment-id-field').value.trim();
+    const deploymentUri = encodeURIComponent(deploymentId);
+    window.open(`https://super.siliconwitchery.com/?deployment=${deploymentUri}`, '_blank');
+  });

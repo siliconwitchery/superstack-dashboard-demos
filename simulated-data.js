@@ -1,10 +1,12 @@
+let idCounter = 56824;
+
 export function getSimulatedData() {
     return [
         {
-            "device_name": "Air Quality Sensors",
-            "device_group": "development",
+            "device": "Air Quality Sensors",
+            "group": "development",
             "timestamp": "2025-10-01T12:53:27.105791Z",
-            "data_uuid": "3d521ded-8f65-44c1-a446-e19ae6e0ac78",
+            "id": idCounter++,
             "data": {
                 "humidity": 28 + (Math.random() * 0.5),
                 "carbon_dioxide": 301 + (Math.random() * 12),
@@ -13,10 +15,10 @@ export function getSimulatedData() {
             }
         },
         {
-            "device_name": "Power Meter",
-            "device_group": "development",
+            "device": "Power Meter",
+            "group": "development",
             "timestamp": "2025-10-01T08:50:40.019346Z",
-            "data_uuid": "3a3ea342-eb92-4fe7-aa56-60fc697781bd",
+            "id": idCounter++,
             "data": {
                 "power": 20.09722900390625 + (Math.random()),
                 "current": 1.6802978515625 + (Math.random() * 0.1),
@@ -24,10 +26,10 @@ export function getSimulatedData() {
             }
         },
         {
-            "device_name": "Color Sensor",
-            "device_group": "development",
+            "device": "Color Sensor",
+            "group": "development",
             "timestamp": "2025-10-01T12:57:21.160993Z",
-            "data_uuid": "3b678867-2500-46d0-b403-113ff396e3dc",
+            "id": idCounter++,
             "data": {
                 "405nm": 829 + (Math.random() * 2000),
                 "425nm": 2875 + (Math.random() * 2000),
@@ -44,10 +46,10 @@ export function getSimulatedData() {
             }
         },
         {
-            "device_name": "Trash Level Sensor",
-            "device_group": "development",
+            "device": "Trash Level Sensor",
+            "group": "development",
             "timestamp": "2025-10-01T13:31:05.557249Z",
-            "data_uuid": "33aeed11-3ccd-4df0-ae9e-874f18c492ed",
+            "id": idCounter++,
             "data": {
                 "trash_level": 32 + (Math.random() * 3)
             }
