@@ -127,18 +127,22 @@ setInterval(async () => {
     if (dataPoint.device === "Color Sensor" && !colorSensorUpdated) {
       colorSensorUpdated = true;
 
-      colorSensorSpectrumChart.data.datasets[0].data[0] = (100 / 65536) * dataPoint.data["405nm"];
-      colorSensorSpectrumChart.data.datasets[0].data[1] = (100 / 65536) * dataPoint.data["425nm"];
-      colorSensorSpectrumChart.data.datasets[0].data[2] = (100 / 65536) * dataPoint.data["450nm"];
-      colorSensorSpectrumChart.data.datasets[0].data[3] = (100 / 65536) * dataPoint.data["475nm"];
-      colorSensorSpectrumChart.data.datasets[0].data[4] = (100 / 65536) * dataPoint.data["515nm"];
-      colorSensorSpectrumChart.data.datasets[0].data[5] = (100 / 65536) * dataPoint.data["555nm"];
-      colorSensorSpectrumChart.data.datasets[0].data[6] = (100 / 65536) * dataPoint.data["550nm"];
-      colorSensorSpectrumChart.data.datasets[0].data[7] = (100 / 65536) * dataPoint.data["600nm"];
-      colorSensorSpectrumChart.data.datasets[0].data[8] = (100 / 65536) * dataPoint.data["640nm"];
-      colorSensorSpectrumChart.data.datasets[0].data[9] = (100 / 65536) * dataPoint.data["690nm"];
-      colorSensorSpectrumChart.data.datasets[0].data[10] = (100 / 65536) * dataPoint.data["745nm"];
-      colorSensorSpectrumChart.data.datasets[0].data[11] = (100 / 65536) * dataPoint.data["855nm"];
+      // The chart plots each channel as a percentage of 1000 counts, wide
+      // enough for a variety of soldermask colors under the demo's fixed
+      // illumination (the reference green board peaks around 320, and a
+      // red board peaks around 850 at 640nm)
+      colorSensorSpectrumChart.data.datasets[0].data[0] = (100 / 1000) * dataPoint.data["405nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[1] = (100 / 1000) * dataPoint.data["425nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[2] = (100 / 1000) * dataPoint.data["450nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[3] = (100 / 1000) * dataPoint.data["475nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[4] = (100 / 1000) * dataPoint.data["515nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[5] = (100 / 1000) * dataPoint.data["555nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[6] = (100 / 1000) * dataPoint.data["550nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[7] = (100 / 1000) * dataPoint.data["600nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[8] = (100 / 1000) * dataPoint.data["640nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[9] = (100 / 1000) * dataPoint.data["690nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[10] = (100 / 1000) * dataPoint.data["745nm"];
+      colorSensorSpectrumChart.data.datasets[0].data[11] = (100 / 1000) * dataPoint.data["855nm"];
       colorSensorSpectrumChart.update();
 
       // Helper function to determine if value is in a certain range
@@ -146,18 +150,22 @@ setInterval(async () => {
         return target - data >= -range && target - data <= range;
       }
 
-      document.getElementById("color_check_405nm").textContent = within(dataPoint.data["405nm"], 3840, 1500) ? "✅" : "❌";
-      document.getElementById("color_check_425nm").textContent = within(dataPoint.data["425nm"], 7936, 1500) ? "✅" : "❌";
-      document.getElementById("color_check_450nm").textContent = within(dataPoint.data["450nm"], 38912, 1500) ? "✅" : "❌";
-      document.getElementById("color_check_475nm").textContent = within(dataPoint.data["475nm"], 45056, 1500) ? "✅" : "❌";
-      document.getElementById("color_check_515nm").textContent = within(dataPoint.data["515nm"], 15873, 1500) ? "✅" : "❌";
-      document.getElementById("color_check_550nm").textContent = within(dataPoint.data["550nm"], 29184, 1500) ? "✅" : "❌";
-      document.getElementById("color_check_555nm").textContent = within(dataPoint.data["555nm"], 16129, 1500) ? "✅" : "❌";
-      document.getElementById("color_check_600nm").textContent = within(dataPoint.data["600nm"], 52224, 1500) ? "✅" : "❌";
-      document.getElementById("color_check_640nm").textContent = within(dataPoint.data["640nm"], 29184, 1500) ? "✅" : "❌";
-      document.getElementById("color_check_690nm").textContent = within(dataPoint.data["690nm"], 15616, 1500) ? "✅" : "❌";
-      document.getElementById("color_check_745nm").textContent = within(dataPoint.data["745nm"], 4096, 1500) ? "✅" : "❌";
-      document.getElementById("color_check_855nm").textContent = within(dataPoint.data["855nm"], 4608, 1500) ? "✅" : "❌";
+      // Targets are the reference PCB's readings, and each range sits about
+      // halfway to the wrong soldermask's readings so both PCBs classify
+      // with margin. The mid band channels (515/555/600nm) separate the two
+      // colors most strongly
+      document.getElementById("color_check_405nm").textContent = within(dataPoint.data["405nm"], 16, 1) ? "✅" : "❌";
+      document.getElementById("color_check_425nm").textContent = within(dataPoint.data["425nm"], 32, 2) ? "✅" : "❌";
+      document.getElementById("color_check_450nm").textContent = within(dataPoint.data["450nm"], 156, 5) ? "✅" : "❌";
+      document.getElementById("color_check_475nm").textContent = within(dataPoint.data["475nm"], 178, 3) ? "✅" : "❌";
+      document.getElementById("color_check_515nm").textContent = within(dataPoint.data["515nm"], 321, 14) ? "✅" : "❌";
+      document.getElementById("color_check_550nm").textContent = within(dataPoint.data["550nm"], 117, 5) ? "✅" : "❌";
+      document.getElementById("color_check_555nm").textContent = within(dataPoint.data["555nm"], 323, 13) ? "✅" : "❌";
+      document.getElementById("color_check_600nm").textContent = within(dataPoint.data["600nm"], 207, 8) ? "✅" : "❌";
+      document.getElementById("color_check_640nm").textContent = within(dataPoint.data["640nm"], 116, 4) ? "✅" : "❌";
+      document.getElementById("color_check_690nm").textContent = within(dataPoint.data["690nm"], 62, 2) ? "✅" : "❌";
+      document.getElementById("color_check_745nm").textContent = within(dataPoint.data["745nm"], 17, 1) ? "✅" : "❌";
+      document.getElementById("color_check_855nm").textContent = within(dataPoint.data["855nm"], 19, 1) ? "✅" : "❌";
     }
 
     if (dataPoint.device === "Trash Level Sensor" && !trashLevelUpdated) {
