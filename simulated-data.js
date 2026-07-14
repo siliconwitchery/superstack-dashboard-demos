@@ -31,18 +31,18 @@ export function getSimulatedData() {
             "timestamp": "2025-10-01T12:57:21.160993Z",
             "id": idCounter++,
             "data": {
-                "405nm": 16 + (Math.random() * 2 - 1),
-                "425nm": 32 + (Math.random() * 2 - 1),
-                "450nm": 156 + (Math.random() * 2 - 1),
-                "475nm": 178 + (Math.random() * 2 - 1),
-                "515nm": 321 + (Math.random() * 2 - 1),
-                "550nm": 117 + (Math.random() * 2 - 1),
-                "555nm": 323 + (Math.random() * 2 - 1),
-                "600nm": 207 + (Math.random() * 2 - 1),
-                "640nm": 116 + (Math.random() * 2 - 1),
-                "690nm": 62 + (Math.random() * 2 - 1),
-                "745nm": 17 + (Math.random() * 2 - 1),
-                "855nm": 19 + (Math.random() * 2 - 1)
+                "405nm": 15 + (Math.random() * 2 - 1),
+                "425nm": 30 + (Math.random() * 2 - 1),
+                "450nm": 150 + (Math.random() * 2 - 1),
+                "475nm": 174 + (Math.random() * 2 - 1),
+                "515nm": 317 + (Math.random() * 2 - 1),
+                "550nm": 114 + (Math.random() * 2 - 1),
+                "555nm": 318 + (Math.random() * 2 - 1),
+                "600nm": 202 + (Math.random() * 2 - 1),
+                "640nm": 114 + (Math.random() * 2 - 1),
+                "690nm": 61 + (Math.random() * 2 - 1),
+                "745nm": 16 + (Math.random() * 2 - 1),
+                "855nm": 18 + (Math.random() * 2 - 1)
             }
         },
         {

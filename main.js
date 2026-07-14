@@ -150,22 +150,24 @@ setInterval(async () => {
         return target - data >= -range && target - data <= range;
       }
 
-      // Targets are the reference PCB's readings, and each range sits about
-      // halfway to the wrong soldermask's readings so both PCBs classify
-      // with margin. The mid band channels (515/555/600nm) separate the two
-      // colors most strongly
-      document.getElementById("color_check_405nm").textContent = within(dataPoint.data["405nm"], 16, 1) ? "✅" : "❌";
-      document.getElementById("color_check_425nm").textContent = within(dataPoint.data["425nm"], 32, 2) ? "✅" : "❌";
-      document.getElementById("color_check_450nm").textContent = within(dataPoint.data["450nm"], 156, 5) ? "✅" : "❌";
-      document.getElementById("color_check_475nm").textContent = within(dataPoint.data["475nm"], 178, 3) ? "✅" : "❌";
-      document.getElementById("color_check_515nm").textContent = within(dataPoint.data["515nm"], 321, 14) ? "✅" : "❌";
-      document.getElementById("color_check_550nm").textContent = within(dataPoint.data["550nm"], 117, 5) ? "✅" : "❌";
-      document.getElementById("color_check_555nm").textContent = within(dataPoint.data["555nm"], 323, 13) ? "✅" : "❌";
-      document.getElementById("color_check_600nm").textContent = within(dataPoint.data["600nm"], 207, 8) ? "✅" : "❌";
-      document.getElementById("color_check_640nm").textContent = within(dataPoint.data["640nm"], 116, 4) ? "✅" : "❌";
-      document.getElementById("color_check_690nm").textContent = within(dataPoint.data["690nm"], 62, 2) ? "✅" : "❌";
-      document.getElementById("color_check_745nm").textContent = within(dataPoint.data["745nm"], 17, 1) ? "✅" : "❌";
-      document.getElementById("color_check_855nm").textContent = within(dataPoint.data["855nm"], 19, 1) ? "✅" : "❌";
+      // The windows are wide enough that the reference PCB passes across
+      // small repositioning on the jig, which shifts all channels a few
+      // percent together. That brightness shift overlaps the off color
+      // board's readings on the dimmer channels, so only the mid band
+      // channels (515/550/555/600/640nm) discriminate the soldermask color.
+      // An off color board trips those five; the rest stay green
+      document.getElementById("color_check_405nm").textContent = within(dataPoint.data["405nm"], 15, 3) ? "✅" : "❌";
+      document.getElementById("color_check_425nm").textContent = within(dataPoint.data["425nm"], 30, 4) ? "✅" : "❌";
+      document.getElementById("color_check_450nm").textContent = within(dataPoint.data["450nm"], 150, 9) ? "✅" : "❌";
+      document.getElementById("color_check_475nm").textContent = within(dataPoint.data["475nm"], 174, 7) ? "✅" : "❌";
+      document.getElementById("color_check_515nm").textContent = within(dataPoint.data["515nm"], 317, 12) ? "✅" : "❌";
+      document.getElementById("color_check_550nm").textContent = within(dataPoint.data["550nm"], 114, 6) ? "✅" : "❌";
+      document.getElementById("color_check_555nm").textContent = within(dataPoint.data["555nm"], 318, 13) ? "✅" : "❌";
+      document.getElementById("color_check_600nm").textContent = within(dataPoint.data["600nm"], 202, 9) ? "✅" : "❌";
+      document.getElementById("color_check_640nm").textContent = within(dataPoint.data["640nm"], 114, 5) ? "✅" : "❌";
+      document.getElementById("color_check_690nm").textContent = within(dataPoint.data["690nm"], 61, 3) ? "✅" : "❌";
+      document.getElementById("color_check_745nm").textContent = within(dataPoint.data["745nm"], 16, 3) ? "✅" : "❌";
+      document.getElementById("color_check_855nm").textContent = within(dataPoint.data["855nm"], 18, 3) ? "✅" : "❌";
     }
 
     if (dataPoint.device === "Trash Level Sensor" && !trashLevelUpdated) {
